@@ -116,3 +116,7 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Editors
+## emacs
+*~

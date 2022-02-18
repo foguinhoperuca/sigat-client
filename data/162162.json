@@ -1,0 +1,21 @@
+{
+	"idBem": 294576,
+	"numRegistro": 162162,
+	"estruturaProduto": "1.35.01.10.00",
+	"descrEstrutura": "NOTEBOOK",
+	"descrBem": "NOTEBOOK",
+	"caracteristicaBem": " SIM HP D40 BRG103FH6D 0 DT_AQUISICAO=28/01/11",
+	"formaingressoItem": 12,
+	"formaIngresso": "Levantamento Patrimonial",
+	"vlNominal": 1050,
+	"vlAquisicao": 1679.26,
+	"estadoConsItem": 1,
+	"conservacao": "Bom",
+	"situacaoBemItem": 1,
+	"situacao": "Em Uso",
+	"idUnidade": 1752,
+	"codEstruturado": "1.1.10.03.01.01.784.000",
+	"nomeUnidade": "CEI 25 \"Jorge Frederico Scherepel\"",
+	"dtAquisicao": "01/03/2013",
+	"dtTombamento": "01/03/2013"
+}

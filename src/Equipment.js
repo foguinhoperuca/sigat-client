@@ -74,6 +74,7 @@ export default class Equipment extends React.Component {
 			  onChange={this.handleChange}
 			  disabled={this.state.isValid}
 			  className={this.state.validate_class_name}
+			  required
 			/>
 			<Button disabled={this.state.isValid} variant="info" onClick={this.handleSubmit}>
 			  <span className="bi bi-search"></span>
@@ -81,9 +82,6 @@ export default class Equipment extends React.Component {
 		  </InputGroup>
 		  {this.state.descrBem}
 		  <br />
-		  <Form.Control.Feedback type="invalid">
-			Informe um patrimônio válido
-		  </Form.Control.Feedback>
 		  <Form.Text className="text-muted">
 			Somente equipamentos da Prefeitura ou serviço relacionados as atividades da Prefeitura serão atendidos.
 		  </Form.Text>

@@ -7,6 +7,7 @@ import Button from 'react-bootstrap/Button';
 import logopms from './images/logo_pms.png'
 
 import Equipment from './Equipment';
+import Person from './Person';
 
 
 function App() {
@@ -27,37 +28,13 @@ function App() {
         </a>
       </header>
 	  <Form className="container">
-		<Form.Group className="mb-3" controlId="formBasicEmail">
-		  <Form.Label>Nome</Form.Label>
-		  <Form.Control type="text" placeholder="Nome Completo" />
-		</Form.Group>
-
-		<Form.Group className="mb-3" controlId="formBasicLocation">
-		  <Form.Label>Unidade/Local de Trabalho</Form.Label>
-		  <Form.Control type="text" placeholder="Local onde está o seu equipamento" />
-		</Form.Group>
-
-		<Form.Group className="mb-3" controlId="formBasicContact">
-		  <Form.Label>Telefone/Ramal Corporativo</Form.Label>
-		  <Form.Control type="text" placeholder="Telefone da Prefeitura" />
-		  <Form.Label>Whatsapp</Form.Label>
-		  <Form.Control type="tel" placeholder="Para agilizar o contato" />
-		  <br />
-		  <InputGroup className="mb-3">
-			<FormControl
-			  placeholder="Usuário da Rede"
-			  aria-label="Usuário da Rede"
-			  aria-describedby="basic-addon2"
-			/>
-			<InputGroup.Text id="basic-addon2">@sorocaba.sp.gov.br</InputGroup.Text>
-		  </InputGroup>
-		</Form.Group>
+		<Person />
 
 		<Equipment />
 
 		<Form.Group className="mb-3" controlId="formBasicLocation">
 		  <Form.Select aria-label="Default select example">
-			<option>Informe o Serviço Desejado da TI</option>
+			<option>Informe o Serviço Desejado da TI Se Souber</option>
 			<option value="1">Administrativo</option>
 			<option value="2">Redes</option>
 			<option value="3">Sistemas Internos e Legados</option>
@@ -72,10 +49,10 @@ function App() {
 
 		<Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
 		  <Form.Label>Descrição</Form.Label>
-		  <Form.Control as="textarea" rows={5} />
+		  <Form.Control as="textarea" rows={5} required />
 		</Form.Group>
 
-		<Button variant="warning" type="submit">
+		<Button variant="primary" type="submit">
 		  Enviar Chamado !
 		</Button>
 	  </Form>
@@ -84,8 +61,3 @@ function App() {
 }
 
 export default App;
-
-
-/* How open an issue?
- * - description
- */

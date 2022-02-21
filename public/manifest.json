@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Portal do Cliente",
+  "name": "Portal do Cliente para chamados da PMS/TI",
   "icons": [
     {
       "src": "favicon.ico",

@@ -15,7 +15,7 @@ function App() {
       <header className="App-header">
         <img src={logopms} className="App-logopms" alt="logo" />
         <p>
-		  Formulário de abertura de chamado para <code>informática</code>.
+		  Formulário para abertura de chamado da <code>informática</code>.
         </p>
         <a
           className="App-link"
@@ -25,8 +25,6 @@ function App() {
         >
           Enviar chamado por e-mail para o suporte
         </a>
-		<br />
-		<Equipment />
       </header>
 	  <Form className="container">
 		<Form.Group className="mb-3" controlId="formBasicEmail">
@@ -55,21 +53,7 @@ function App() {
 		  </InputGroup>
 		</Form.Group>
 
-		<Form.Group className="mb-3" controlId="formBasicLocation">
-		  <Form.Label>Equipamento</Form.Label>
-		  {/* <Form.Control type="text" placeholder="Informe o patrimônio" /> */}
-		  <InputGroup className="mb-3">
-			<InputGroup.Text id="basic-addon1">pms-</InputGroup.Text>
-			<FormControl
-			  placeholder="Patrimônio"
-			  aria-label="Patrimônio"
-			  aria-describedby="basic-addon1"
-			/>
-		  </InputGroup>
-		  <Form.Text className="text-muted">
-			Somente equipamentos da Prefeitura ou serviço relacionados as atividades da Prefeitura são atendidos.
-		  </Form.Text>
-		</Form.Group>
+		<Equipment />
 
 		<Form.Group className="mb-3" controlId="formBasicLocation">
 		  <Form.Select aria-label="Default select example">

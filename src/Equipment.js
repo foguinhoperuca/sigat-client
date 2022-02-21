@@ -1,21 +1,28 @@
 import React from 'react';
-
+import InputGroup from 'react-bootstrap/InputGroup';
+import Form from 'react-bootstrap/Form';
+import FormControl from 'react-bootstrap/FormControl';
+import Button from 'react-bootstrap/Button';
 
 export default class Equipment extends React.Component {
   constructor(props) {
 	super(props)
 	this.state = {
-	  numRegistro: '307005',
-	  descrBem: 'MICRO NUCLEO QUADRUPLO 2.9 GHZ 500 GB 4 GB'
+	  numRegistro: null,
+	  descrBem: null,
+	  isValid: false,
+	  validate_class_name: null
 	};
 
 	this.handleChange = this.handleChange.bind(this);
 	this.handleSubmit = this.handleSubmit.bind(this);
+	this.handleSearch = this.handleSearch.bind(this);
   }
   
   handleChange(event) {
 	this.setState({
-	  numRegistro: event.target.value
+	  numRegistro: event.target.value,
+	  descrBem: null
 	});
   }
   
@@ -23,36 +30,64 @@ export default class Equipment extends React.Component {
 	event.preventDefault();
 
 	let patr = '/' + this.state.numRegistro;
-	console.log(patr);
 
-	/* TODO handle api's return null */
-	/* TODO implement a sub-form to get data from server and make input readonly. */
 	fetch(patr)
 	  .then(response => response.json())
-	  .then(data =>
-		/* console.log(data["descrBem"]) */
-		this.setState({
-		  numRegistro: data["numRegistro"],
-		  descrBem: data["descrBem"]
-		})
-	  );
+	  .then(data => {
+		if (data == null) {
+		  this.setState({
+			validate_class_name: "is-invalid",
+			descrBem: "Patrimônio não encontrado!"
+		  });
+		} else {
+		  this.setState({
+			numRegistro: data["numRegistro"],
+			descrBem: data["descrBem"],
+			isValid: true,
+			validate_class_name: "is-valid"
+		  })	
+		}
+	  });
+  }
 
+  handleSearch(event) {
+	event.preventDefault();
+	this.setState({
+	  isValid: false,
+	  descrBem: null,
+	  validate_class_name: null
+	});
+
+	console.log("TODO implement validation by descrBem!!");
   }
 
   render() {
 	return (
 	  <div>
-		Patrimônio é: {this.state.numRegistro} -> {this.state.descrBem}
-		<br />
-		<form onSubmit={this.handleSubmit}>
-          <label>
-			Patrimônio:
-			<br />
-			<input type="text" onChange={this.handleChange} />
-          </label>
+		<Form.Group className="mb-3" controlId="formBasicLocation">
+		  <Form.Label>Equipamento</Form.Label>
+		  <InputGroup className="mb-3" hasValidation>
+			<InputGroup.Text id="basic-addon1" onClick={this.handleSearch}>pms-</InputGroup.Text>
+			<FormControl
+			  placeholder="Patrimônio"
+			  aria-label="Patrimônio"
+			  onChange={this.handleChange}
+			  disabled={this.state.isValid}
+			  className={this.state.validate_class_name}
+			/>
+			<Button disabled={this.state.isValid} variant="info" onClick={this.handleSubmit}>
+			  <span className="bi bi-search"></span>
+			</Button>
+		  </InputGroup>
+		  {this.state.descrBem}
 		  <br />
-          <input type="submit" value="Submit" />
-		</form>
+		  <Form.Control.Feedback type="invalid">
+			Informe um patrimônio válido
+		  </Form.Control.Feedback>
+		  <Form.Text className="text-muted">
+			Somente equipamentos da Prefeitura ou serviço relacionados as atividades da Prefeitura serão atendidos.
+		  </Form.Text>
+		</Form.Group>
 	  </div>
 	);
   }

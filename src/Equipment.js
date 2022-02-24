@@ -64,7 +64,7 @@ export default class Equipment extends React.Component {
   render() {
 	return (
 	  <div>
-		<Form.Group className="mb-3" controlId="formBasicLocation">
+		<Form.Group className="mb-3" controlId="formEquipment">
 		  <Form.Label>Equipamento</Form.Label>
 		  <InputGroup className="mb-3" hasValidation>
 			<InputGroup.Text id="basic-addon1" onClick={this.handleSearch}>pms-</InputGroup.Text>

@@ -83,6 +83,8 @@ export default class Person extends React.Component {
 		  whatsapp: event.target.value
 		};
 		break;
+	  default:
+		console.error("Not found person field to handle change!!");
 	}
 	this.setState(state_update);
   }
@@ -108,6 +110,8 @@ export default class Person extends React.Component {
 	  case 'btnWhatsapp':
 		input_text = 'formWhatsapp';
 		break;
+	  default:
+		console.error("Not found person field to handle edit!!");
 	}
 	this.toggleEdit(document.getElementById(input_text), event.target);
   }

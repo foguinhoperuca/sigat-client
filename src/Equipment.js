@@ -29,7 +29,8 @@ export default class Equipment extends React.Component {
   handleSubmit(event) {
 	event.preventDefault();
 
-	let patr = '/' + this.state.numRegistro;
+	/* TODO implement error handle here and in backend! */
+	let patr = `/events/show_sim_assets/${this.state.numRegistro}.json`
 
 	fetch(patr)
 	  .then(response => response.json())

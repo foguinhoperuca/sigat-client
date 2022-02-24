@@ -69,7 +69,7 @@ Descrição: ${description}`);
 		  <Equipment />
 		  <Form.Group className="mb-3" controlId="formService">
 			<Form.Select aria-label="Default select example">
-			  <option>Informe o Serviço Desejado da TI Se Souber</option>
+			  <option>--- Informe o Serviço Desejado da TI Se Souber ---</option>
 			  <option value="1">Administrativo</option>
 			  <option value="2">Redes</option>
 			  <option value="3">Sistemas Internos e Legados</option>

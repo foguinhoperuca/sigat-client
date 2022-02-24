@@ -29,19 +29,35 @@ export default class Person extends React.Component {
   handleSubmit(event) {
 	event.preventDefault();
 
-	let url = '/' + this.state.username;
+	/* TODO handle errors here and in backend! */
+	let url = `/events/filter_by_login.json?login=${this.state.username}&limit=1`;
 
-	console.log("TODO implement get data with fetch: " + url);
-	this.setState({
-	  name: 'Jefferson Campos',
-	  workplace: 'DGTI/Paço',
-	  phone: '3238-2175',
-	  whatsapp: '15-99723-3588',
-	  isValid: true,
-	  validate_class_name: 'is-valid'
-	});
-
-	/* TODO set all other fields as className is-valid and disabled true */
+	fetch(url)
+	  .then(response => response.json())
+	  .then(data => {
+		console.log("showing data...");
+		console.log(data);
+		console.log(data[0]);
+		if (data == null) {
+		  this.setState({
+			name: null,
+			workplace: null,
+			phone: null,
+			whatsapp: null,
+			isValid: false,
+			validate_class_name: "is-invalid"
+		  });
+		} else {
+		  this.setState({
+			name: data[0]["NOME_USUARIO"],
+			workplace: data[0]["LOTACAO_USUARIO"],
+			phone: 'TODO implement API to get phone data!',
+			whatsapp: 'TODO implement API to get whatsapp data!',
+			isValid: true,
+			validate_class_name: "is-valid"
+		  });
+		}
+	  });
   }
 
   handleSearch(event) {

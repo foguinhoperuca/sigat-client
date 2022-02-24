@@ -50,6 +50,9 @@ function App() {
 		<Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
 		  <Form.Label>Descrição</Form.Label>
 		  <Form.Control as="textarea" rows={5} required />
+		  <Form.Text className="text-muted">
+			Caso mais de um patrimônio necessite de manutenção, informe abaixo utilizando-se do prefixo mais 6 números (um por linha). Ex.: pms-123456
+		  </Form.Text>
 		</Form.Group>
 
 		<Button variant="primary" type="submit">

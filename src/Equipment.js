@@ -29,13 +29,12 @@ export default class Equipment extends React.Component {
   handleSubmit(event) {
 	event.preventDefault();
 
-	/* TODO implement error handle here and in backend! */
-	let patr = `/events/show_sim_assets/${this.state.numRegistro}.json`
+	let patr = `/api/sim/show_sim_assets/${this.state.numRegistro}.json`
 
 	fetch(patr)
 	  .then(response => response.json())
 	  .then(data => {
-		if (data == null) {
+		if (data["numRegistro"] === "NÃO ENCONTRADO!") {
 		  this.setState({
 			validate_class_name: "is-invalid",
 			descrBem: "Patrimônio não encontrado!"

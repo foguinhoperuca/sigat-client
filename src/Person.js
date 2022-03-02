@@ -30,7 +30,7 @@ export default class Person extends React.Component {
 	event.preventDefault();
 
 	/* TODO handle errors here and in backend! */
-	let url = `/events/filter_by_login.json?login=${this.state.username}&limit=1`;
+	let url = `/api/events/filter_by_login.json?login=${this.state.username}&limit=1`;
 
 	fetch(url)
 	  .then(response => response.json())
@@ -38,21 +38,23 @@ export default class Person extends React.Component {
 		console.log("showing data...");
 		console.log(data);
 		console.log(data[0]);
-		if (data == null) {
+		console.log(data[0] === undefined);
+		if (data[0] === undefined) {
 		  this.setState({
-			name: null,
-			workplace: null,
-			phone: null,
-			whatsapp: null,
+			name: '',
+			workplace: '',
+			phone: '',
+			whatsapp: '',
 			isValid: false,
 			validate_class_name: "is-invalid"
 		  });
 		} else {
+		  /* TODO implement API to get phone and whatsapp data! */
 		  this.setState({
 			name: data[0]["NOME_USUARIO"],
 			workplace: data[0]["LOTACAO_USUARIO"],
-			phone: 'TODO implement API to get phone data!',
-			whatsapp: 'TODO implement API to get whatsapp data!',
+			phone: '',
+			whatsapp: '',
 			isValid: true,
 			validate_class_name: "is-valid"
 		  });
@@ -89,7 +91,7 @@ export default class Person extends React.Component {
 		  workplace: event.target.value
 		};
 		break;
-	  case 'formPhboneBasicEmail':
+	  case 'formPhone':
 		state_update = {
 		  phone: event.target.value
 		};
@@ -164,7 +166,8 @@ export default class Person extends React.Component {
 			<InputGroup.Text id="basic-addon2" onClick={this.handleSearch}>@sorocaba.sp.gov.br</InputGroup.Text>
 			<Button variant="info" disabled={this.state.isValid} onClick={this.handleSubmit}><span className="bi bi-search"></span></Button>
 		  </InputGroup>
-		  <Form.Text className="text-muted">Confirme os seus dados abaixo antes de enviar o chamado!</Form.Text>
+		  {(this.state.validate_class_name == null) ? '' : (this.state.isValid ? 'Dados carregados com sucesso!!' : 'Usuário não encontrado!!')}<br />
+	  <Form.Text className="text-muted">Confirme os seus dados abaixo antes de enviar o chamado!</Form.Text>
 		</Form.Group>
 		<Form.Group className="mb-3" controlId="formName">
 		  <Form.Label>Nome</Form.Label>

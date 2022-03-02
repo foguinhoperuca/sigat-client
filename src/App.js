@@ -60,11 +60,11 @@ Descrição: ${description}`);
 			href={this.state.issue}
 			target="_blank"
 			rel="noopener noreferrer"
-			>
+		  >
 			Enviar chamado por e-mail para o suporte
 		  </a>
 		</header>
-		<Form className="container">
+		<Form className="container" action={this.state.issue} onSubmit={this.handleLink}>
 		  <Person username={this.handlePersonUsername} />
 		  <Equipment />
 		  <Form.Group className="mb-3" controlId="formService">
@@ -88,9 +88,10 @@ Descrição: ${description}`);
 			  Caso mais de um patrimônio necessite de manutenção, informe abaixo utilizando-se do prefixo mais 6 números (um por linha). Ex.: pms-123456
 			</Form.Text>
 		  </Form.Group>
-		  <Button variant="primary" type="submit">
-			Enviar Chamado !
-		  </Button>
+		  {/* TODO work with form action to send e-mail! */}
+		  {/* <Button variant="primary" type="submit">
+			  Enviar Chamado !!
+			  </Button> */}
 		</Form>
       </div>
 	);

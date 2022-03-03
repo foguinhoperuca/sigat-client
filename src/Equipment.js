@@ -65,16 +65,15 @@ export default class Equipment extends React.Component {
 	return (
 	  <div>
 		<Form.Group className="mb-3" controlId="formEquipment">
-		  <Form.Label>Equipamento</Form.Label>
 		  <InputGroup className="mb-3" hasValidation>
 			<InputGroup.Text id="basic-addon1" onClick={this.handleSearch}>pms-</InputGroup.Text>
 			<FormControl
-			  placeholder="Patrimônio"
-			  aria-label="Patrimônio"
-			  onChange={this.handleChange}
-			  disabled={this.state.isValid}
-			  className={this.state.validate_class_name}
-			  required
+			placeholder="Patrimônio"
+			aria-label="Patrimônio"
+			onChange={this.handleChange}
+			disabled={this.state.isValid}
+			className={this.state.validate_class_name}
+			required
 			/>
 			<Button disabled={this.state.isValid} variant="info" onClick={this.handleSubmit}>
 			  <span className="bi bi-search"></span>

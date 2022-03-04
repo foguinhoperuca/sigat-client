@@ -74,6 +74,7 @@ export default class Equipment extends React.Component {
 			disabled={this.state.isValid}
 			className={this.state.validate_class_name}
 			required
+			name="txtEquipment"
 			/>
 			<Button disabled={this.state.isValid} variant="info" onClick={this.handleSubmit}>
 			  <span className="bi bi-search"></span>

@@ -23,15 +23,6 @@ export default class App extends React.Component {
 	this.handleLink = this.handleLink.bind(this);
 	this.handleEquipmentDelete = this.handleEquipmentDelete.bind(this);
 	this.handleEquipmentAdd = this.handleEquipmentAdd.bind(this);
-	this.handleMultipleEquipmentTest = this.handleMultipleEquipmentTest.bind(this);
-  }
-
-  handleMultipleEquipmentTest(event) {
-	event.preventDefault();
-	console.log("TODO test/implement get multiple equipment input value");
-	/* FIXME how to get multiple values (not first only - get element by class!?)?! */
-	let equipment = document.getElementById('formEquipment').value;
-	console.log(equipment);
   }
 
   handleLink(event) {
@@ -41,7 +32,11 @@ export default class App extends React.Component {
 	let workplace = document.getElementById('formWorkplace').value;
 	let phone = document.getElementById('formPhone').value;
 	let whatsapp = document.getElementById('formWhatsapp').value;
-	let equipment = document.getElementById('formEquipment').value;
+	let equipment = "";
+	document.getElementsByName("txtEquipment").forEach((eqpmnt, index) => {
+	  equipment = equipment.concat("pms-", eqpmnt.value, " :: ");
+	});
+	equipment = equipment.replace(/ :: $/, "");
 	let service = document.getElementById('formService').options[document.getElementById('formService').selectedIndex].text;
 	let description = document.getElementById('formDescription').value;
 
@@ -96,7 +91,7 @@ Descrição: ${description}`);
 		  <h3>Dados Pessoais</h3>
 		  <Person />
 		  <h3>Equipamentos</h3>
-	      <span className="btn btn-success btn-sm" onClick={this.handleEquipmentAdd}><span className="bi bi-plus-square"></span></span>&nbsp;<span className="btn btn-danger btn-sm" onClick={this.handleEquipmentDelete}><span className="bi bi-trash"></span></span>&nbsp;<span className="btn btn-warning btn-sm" onClick={this.handleMultipleEquipmentTest}><span className="bi bi-radioactive"></span></span>
+	      <span className="btn btn-success btn-sm" onClick={this.handleEquipmentAdd}><span className="bi bi-plus-square"></span></span>&nbsp;<span className="btn btn-danger btn-sm" onClick={this.handleEquipmentDelete}><span className="bi bi-trash"></span></span>&nbsp;
 		  <br />
 		  <br />
 	      {this.state.equipments}

@@ -8,6 +8,11 @@ import Equipment from './Equipment';
 import Person from './Person';
 import Issue from './Issue';
 
+import Navbar from 'react-bootstrap/Navbar';
+import Nav from 'react-bootstrap/Nav';
+import NavDropdown from 'react-bootstrap/NavDropdown';
+import Container from 'react-bootstrap/Container';
+
 export default class App extends React.Component {
 
   constructor(props) {
@@ -80,25 +85,39 @@ Descrição: ${description}`);
   render() {
 	return (
 	  <div className="App">
-	    <header className="App-header">
+	    <header className="App-header" id="main-header">
 		  <img src={logopms} className="App-logopms" alt="logo" />
 		  <p>
 	        Formulário para abertura de chamado da <code>informática</code>.
 		  </p>
 		  <a onClick={this.handleLink} className="App-link" href={this.state.issue} target="_blank" rel="noopener noreferrer">Enviar chamado por e-mail para o suporte</a>
 		</header>
+		<Navbar bg="light" expand="sm" sticky="top">
+		  <Container>
+			<Navbar.Brand href="#main-header">SIGAT</Navbar.Brand>
+			<Navbar.Toggle aria-controls="basic-navbar-nav" />
+			<Navbar.Collapse id="basic-navbar-nav">
+			  <Nav className="me-auto">
+				<Nav.Link href="#hdrPerson">Dados Pessoais</Nav.Link>
+				<Nav.Link href="#hdrEquipments">Equipamentos</Nav.Link>
+				<Nav.Link href="#hdrIssue">Chamado</Nav.Link>
+			  </Nav>
+			  <div className="d-flex">
+				<a onClick={this.handleLink} className="btn btn-success" href={this.state.issue} target="_blank" rel="noopener noreferrer">Enviar</a>
+			  </div>
+			</Navbar.Collapse>
+		  </Container>
+		</Navbar>
 		<Form className="container" action={this.state.issue} onSubmit={this.handleLink}>
-		  <h3>Dados Pessoais</h3>
+		  <h3 id="hdrPerson">Dados Pessoais</h3>
 		  <Person />
-		  <h3>Equipamentos</h3>
+		  <h3 id="hdrEquipments">Equipamentos</h3>
 	      <span className="btn btn-success btn-sm" onClick={this.handleEquipmentAdd}><span className="bi bi-plus-square"></span></span>&nbsp;<span className="btn btn-danger btn-sm" onClick={this.handleEquipmentDelete}><span className="bi bi-trash"></span></span>&nbsp;
 		  <br />
 		  <br />
 	      {this.state.equipments}
-	      <h3>Chamado</h3>
+	      <h3 id="hdrIssue">Chamado</h3>
 	      <Issue />
-		  {/* TODO work with form action to send e-mail! */}
-		  {/* <Button variant="primary" type="submit">Enviar Chamado !!</Button> */}
 		</Form>
       </div>
 	);

@@ -67,7 +67,7 @@ export default class Person extends React.Component {
 	this.setState({
 	  isValid: false,
 	  validate_class_name: null,
-	  username: null
+	  username: ''
 	  /* TODO handle all other fields here?! */
 	});
   }

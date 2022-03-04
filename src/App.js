@@ -1,16 +1,12 @@
 import React from 'react';
 import './App.css';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import logopms from './images/logo_pms.png'
-
 import Equipment from './Equipment';
 import Person from './Person';
 import Issue from './Issue';
-
+import Form from 'react-bootstrap/Form';
+import logopms from './images/logo_pms.png'
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
-import NavDropdown from 'react-bootstrap/NavDropdown';
 import Container from 'react-bootstrap/Container';
 
 export default class App extends React.Component {

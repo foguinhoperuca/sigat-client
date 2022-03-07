@@ -4,10 +4,12 @@ import Equipment from './Equipment';
 import Person from './Person';
 import Issue from './Issue';
 import Form from 'react-bootstrap/Form';
-import logopms from './images/logo_pms.png'
+import logopms from './images/logo_pms.png';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
+
+import { Routes, Route, Link } from "react-router-dom";
 
 export default class App extends React.Component {
 
@@ -81,10 +83,10 @@ Descrição: ${description}`);
   render() {
 	return (
 	  <div className="App">
-	    <header className="App-header" id="main-header">
+		<header className="App-header" id="main-header">
 		  <img src={logopms} className="App-logopms" alt="logo" />
 		  <p>
-	        Formulário para abertura de chamado da <code>informática</code>.
+			Formulário para <code>abertura</code> de chamado da Informática.
 		  </p>
 		  <a onClick={this.handleLink} className="App-link" href={this.state.issue} target="_blank" rel="noopener noreferrer">Enviar chamado por e-mail para o suporte</a>
 		</header>
@@ -97,10 +99,11 @@ Descrição: ${description}`);
 				<Nav.Link href="#hdrPerson">Dados Pessoais</Nav.Link>
 				<Nav.Link href="#hdrEquipments">Equipamentos</Nav.Link>
 				<Nav.Link href="#hdrIssue">Chamado</Nav.Link>
-			  </Nav>
-			  <div className="d-flex">
 				<a onClick={this.handleLink} className="btn btn-success" href={this.state.issue} target="_blank" rel="noopener noreferrer">Enviar</a>
-			  </div>
+			  </Nav>
+			  <Nav>
+				  <Nav.Link as={Link} to="/pesquisar">Pesquisar Chamados</Nav.Link>
+			  </Nav>
 			</Navbar.Collapse>
 		  </Container>
 		</Navbar>
@@ -108,14 +111,14 @@ Descrição: ${description}`);
 		  <h3 id="hdrPerson">Dados Pessoais</h3>
 		  <Person />
 		  <h3 id="hdrEquipments">Equipamentos</h3>
-	      <span className="btn btn-success btn-sm" onClick={this.handleEquipmentAdd}><span className="bi bi-plus-square"></span></span>&nbsp;<span className="btn btn-danger btn-sm" onClick={this.handleEquipmentDelete}><span className="bi bi-trash"></span></span>&nbsp;
+		  <span className="btn btn-success btn-sm" onClick={this.handleEquipmentAdd}><span className="bi bi-plus-square"></span></span>&nbsp;<span className="btn btn-danger btn-sm" onClick={this.handleEquipmentDelete}><span className="bi bi-trash"></span></span>
 		  <br />
 		  <br />
-	      {this.state.equipments}
-	      <h3 id="hdrIssue">Chamado</h3>
-	      <Issue />
+		  {this.state.equipments}
+		  <h3 id="hdrIssue">Chamado</h3>
+		  <Issue />
 		</Form>
-      </div>
+	  </div>
 	);
   }
 }

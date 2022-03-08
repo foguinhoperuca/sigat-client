@@ -13,26 +13,52 @@ export default class Search extends React.Component {
   constructor(props) {
 	super(props);
 	this.state = {
-	  TicketID: '',
-	  ticket: <Ticket />
+	  TicketID: null,
+	  TicketNumber: '', // 2022030402000013
+	  searchResult: null
+	  , tid: 17
 	};
 
 	this.handleSearch = this.handleSearch.bind(this);
+	this.handleChange = this.handleChange.bind(this);
   }
 
   handleSearch(event) {
 	event.preventDefault();
 
-	const user = '';
-	const password = '';
-	let url = `http://digeo-stage.sorocaba.sp.gov.br/otobo/nph-genericinterface.pl/Webservice/GenericTicketConnectorREST/Ticket/${this.state.TicketID}?UserLogin=${user}&Password=${password}`;
+	/* this.setState(state => ({ tid: state.tid + 1 })); */
 
+	/* FIXME implement a way to bundle secrets in reactapp - need be in backend */
+	const user = process.env.REACT_APP_OTRS_USER;
+	const password = process.env.REACT_APP_OTRS_PASSWORD;
+	let url = `/otobo/nph-genericinterface.pl/Webservice/GenericTicketConnectorREST/Ticket?TicketNumber=${this.state.TicketNumber}&UserLogin=${user}&Password=${password}`;
+	console.log(url);
 	fetch(url)
 	  .then(response => response.json())
 	  .then(data => {
 		console.log("data returned");
 		console.log(data);
+		console.log(data.TicketID);
+		if (data.TicketID === undefined) {
+		  console.log(data);
+		  this.setState({
+			TicketID: null,
+			searchResult: 'Ticket Não Encontrado!'
+		  });
+		} else {
+		  console.log(data.TicketID[0]);
+		  this.setState({
+			TicketID: data.TicketID[0],
+			searchResult: 'Ticket Encontrado Com Sucesso!'
+		  });
+		}
 	  });
+  }
+
+  handleChange(event) {
+	this.setState({
+	  TicketNumber: event.target.value
+	});
   }
 
   render() {
@@ -42,9 +68,6 @@ export default class Search extends React.Component {
 		  <img src={logopms} className="App-logopms" alt="logo" />
 		  <p>
 	        Pesquisa de Chamados
-			<br />
-			{/* TODO implement it */}
-			{/* <Link to="/" className="App-link">Abra um chamado aqui!</Link> */}
 		  </p>
 		</header>
 		<Navbar bg="light" expand="sm" sticky="top">
@@ -56,25 +79,26 @@ export default class Search extends React.Component {
 				<Nav.Link href="#generic-data-ticket">Informações Gerais</Nav.Link>
 				<Nav.Link href="#detail-data-ticket">Detalhes</Nav.Link>
 			  </Nav>
-			  <Form className="d-flex">
+			  <Form className="d-flex" onSubmit={this.handleSearch}>
 				<Navbar.Text className="me-3">Ticket</Navbar.Text>
 				<FormControl
 				  type="search"
 				  placeholder="ex: 2022021402000014"
 				  className="me-1"
 				  aria-label="Search"
+				  value={this.state.TicketNumber}
+				  onChange={this.handleChange}
 				/>
-				<Button variant="outline-success">Pesquisar</Button>
+				<Button variant="outline-success" onClick={this.handleSearch}>Pesquisar</Button>
 			  </Form>
 			  <Nav>
-				<Nav.Link href="/">Abrir chamado</Nav.Link>				
+				<Nav.Link as={Link} to="/">Abrir Chamado</Nav.Link>
 			  </Nav>
 			</Navbar.Collapse>
 		  </Container>
 		</Navbar>
 		<div className="container" >
-		  {this.state.ticket}
-		  {/* <Ticket TicketID={this.state.TicketID} /> */}
+	      <Ticket key={this.state.TicketID} TicketID={this.state.TicketID} searchResult={this.state.searchResult} />
 		</div>
 	  </div>
 	);

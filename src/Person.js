@@ -30,7 +30,7 @@ export default class Person extends React.Component {
 	event.preventDefault();
 
 	/* TODO handle errors here and in backend! */
-	let url = `/api/events/filter_by_login.json?login=${this.state.username}&limit=1`;
+	let url = `/rci/events/filter_by_login.json?login=${this.state.username}&limit=1`;
 
 	fetch(url)
 	  .then(response => response.json())

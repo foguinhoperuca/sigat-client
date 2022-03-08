@@ -18,7 +18,7 @@ export default class Ticket extends React.Component {
   componentDidMount() {
 	const user = process.env.REACT_APP_OTRS_USER;
 	const password = process.env.REACT_APP_OTRS_PASSWORD;
-	let url = `/otobo/nph-genericinterface.pl/Webservice/GenericTicketConnectorREST/Ticket/${this.state.TicketID}?UserLogin=${user}&Password=${password}`;
+	let url = `/otrs_api/otobo/nph-genericinterface.pl/Webservice/GenericTicketConnectorREST/Ticket/${this.state.TicketID}?UserLogin=${user}&Password=${password}`;
 
 	let alert_class = "";
 	switch(this.state.searchResult) {

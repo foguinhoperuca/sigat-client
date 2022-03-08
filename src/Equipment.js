@@ -29,7 +29,7 @@ export default class Equipment extends React.Component {
   handleSubmit(event) {
 	event.preventDefault();
 
-	let patr = `/api/sim/show_sim_assets/${this.state.numRegistro}.json`
+	let patr = `/rci/sim/show_sim_assets/${this.state.numRegistro}.json`
 
 	fetch(patr)
 	  .then(response => response.json())

@@ -16,11 +16,9 @@ export default class Ticket extends React.Component {
   }
 
   componentDidMount() {
-	const user = process.env.REACT_APP_OTRS_USER;
-	const password = process.env.REACT_APP_OTRS_PASSWORD;
-	let url = `/otrs_api/otobo/nph-genericinterface.pl/Webservice/GenericTicketConnectorREST/Ticket/${this.state.TicketID}?UserLogin=${user}&Password=${password}`;
-
+	let url = `/gestaoti/otrs/get_ticket?ticket_id=${this.state.TicketID}`;
 	let alert_class = "";
+
 	switch(this.state.searchResult) {
 	  case 'Ticket Encontrado Com Sucesso!':
 		alert_class = "success";
@@ -34,7 +32,7 @@ export default class Ticket extends React.Component {
 	this.setState({
 	  alert: <Alert variant={alert_class}>{this.state.searchResult}</Alert>
 	});
-	
+
 	if (this.state.TicketID != null)
 	  fetch(url)
 	  .then(response => response.json())

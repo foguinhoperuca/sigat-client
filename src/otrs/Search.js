@@ -28,10 +28,7 @@ export default class Search extends React.Component {
 
 	/* this.setState(state => ({ tid: state.tid + 1 })); */
 
-	/* FIXME implement a way to bundle secrets in reactapp - need be in backend */
-	const user = process.env.REACT_APP_OTRS_USER;
-	const password = process.env.REACT_APP_OTRS_PASSWORD;
-	let url = `/otrs_api/otobo/nph-genericinterface.pl/Webservice/GenericTicketConnectorREST/Ticket?TicketNumber=${this.state.TicketNumber}&UserLogin=${user}&Password=${password}`;
+	let url = `/gestaoti/otrs/search_ticket?ticket_number=${this.state.TicketNumber}`;
 	console.log(url);
 	fetch(url)
 	  .then(response => response.json())

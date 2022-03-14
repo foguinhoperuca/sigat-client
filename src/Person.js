@@ -64,6 +64,10 @@ export default class Person extends React.Component {
 
   handleSearch(event) {
 	event.preventDefault();
+
+	/* TODO implement set focus */
+	/* document.getElementById('formBasicEmail').focus(); */
+	
 	this.setState({
 	  isValid: false,
 	  validate_class_name: null,
@@ -165,6 +169,7 @@ export default class Person extends React.Component {
 			<FormControl placeholder="Usuário da Rede" aria-label="Usuário da Rede" aria-describedby="basic-addon2" onChange={this.handleChange} disabled={this.state.isValid} className={this.state.validate_class_name} value={this.state.username} required />
 			<InputGroup.Text id="basic-addon2" onClick={this.handleSearch}>@sorocaba.sp.gov.br</InputGroup.Text>
 			<Button variant="info" disabled={this.state.isValid} onClick={this.handleSubmit}><span className="bi bi-search"></span></Button>
+			<Button id="btnEditSearch" variant="warning" onClick={this.handleSearch} className="bi bi-pencil-square"></Button>
 		  </InputGroup>
 		  {(this.state.validate_class_name == null) ? '' : (this.state.isValid ? 'Dados carregados com sucesso!!' : 'Usuário não encontrado!!')}<br />
 	  <Form.Text className="text-muted">Confirme os seus dados abaixo antes de enviar o chamado!</Form.Text>

@@ -79,6 +79,7 @@ export default class Equipment extends React.Component {
 			<Button disabled={this.state.isValid} variant="info" onClick={this.handleSubmit}>
 			  <span className="bi bi-search"></span>
 			</Button>
+			<Button id="btnEditSearch" variant="warning" onClick={this.handleSearch} className="bi bi-pencil-square"></Button>
 		  </InputGroup>
 		  {this.state.descrBem}
 		  <br />

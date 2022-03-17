@@ -3,6 +3,7 @@ import './App.css';
 import Equipment from './Equipment';
 import Person from './Person';
 import Issue from './Issue';
+import UserBadge from './auth/UserBadge';
 import Form from 'react-bootstrap/Form';
 import logopms from './images/logo_pms.png';
 import Navbar from 'react-bootstrap/Navbar';
@@ -104,6 +105,10 @@ Descrição: ${description}`);
 			  {/* <Nav>
 				  <Nav.Link as={Link} to="/pesquisar">Pesquisar Chamados</Nav.Link>
 				  </Nav> */}
+			  <Nav>
+				{/* TODO use a good UI (alredy btn btn-primary) with Nav.Link history function */}
+				<UserBadge />
+			  </Nav>
 			</Navbar.Collapse>
 		  </Container>
 		</Navbar>

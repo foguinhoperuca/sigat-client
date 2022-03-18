@@ -33,7 +33,10 @@ export default class App extends React.Component {
 	/* TODO lift up children props */
 	let username = document.getElementById('formBasicEmail').value;
 	let name = document.getElementById('formName').value;
+	let department = document.getElementById('formDepartment').value;
 	let workplace = document.getElementById('formWorkplace').value;
+	let complementWorkplace = document.getElementById('formComplementWorkplace').value;
+	let localContact = document.getElementById('formLocalContact').value;
 	let phone = document.getElementById('formPhone').value;
 	let whatsapp = document.getElementById('formWhatsapp').value;
 	let equipment = "";
@@ -46,10 +49,13 @@ export default class App extends React.Component {
 
 	let subject = `Suporte Técnico ${service}`;
 	let body = encodeURI(`Responsável Abertura Chamado: ${name} (${username}@sorocaba.sp.gov.br)
-Unidade/Local de Trabalho: ${workplace}
-Contato: ${phone}
+Secretaria: ${department}
+Local da Solicitação: ${workplace}
+Complemento do Local da Solicitação: ${complementWorkplace}
+Contato no Local: ${localContact}
+Telefone Corporativo: ${phone}
 Whatsapp: ${whatsapp}
-Patrimônio: ${equipment}
+Patrimônio(s): ${equipment}
 Serviço TI: ${service}
 Descrição: ${description}`);
 

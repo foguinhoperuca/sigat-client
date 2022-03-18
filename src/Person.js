@@ -10,7 +10,10 @@ export default class Person extends React.Component {
 	this.state = {
 	  username: '',
 	  name: '',
+	  department: '',
 	  workplace: '',
+	  complementWorkplace: '',
+	  localContact: '',
 	  phone: '',
 	  whatsapp: '',
 	  isValid: false,
@@ -35,14 +38,17 @@ export default class Person extends React.Component {
 	fetch(url)
 	  .then(response => response.json())
 	  .then(data => {
-		console.log("showing data...");
-		console.log(data);
-		console.log(data[0]);
-		console.log(data[0] === undefined);
+		/* console.log("showing data...");
+		   console.log(data);
+		   console.log(data[0]);
+		   console.log(data[0] === undefined); */
 		if (data[0] === undefined) {
 		  this.setState({
 			name: '',
+			department: '',
 			workplace: '',
+			complementWorkplace: '',
+			localContact: '',
 			phone: '',
 			whatsapp: '',
 			isValid: false,
@@ -52,7 +58,10 @@ export default class Person extends React.Component {
 		  /* TODO implement API to get phone and whatsapp data! */
 		  this.setState({
 			name: data[0]["NOME_USUARIO"],
-			workplace: data[0]["LOTACAO_USUARIO"],
+			department: data[0]["LOTACAO_USUARIO"],
+			workplace: '',
+			complementWorkplace: '',
+			localContact: '',
 			phone: '',
 			whatsapp: '',
 			isValid: true,
@@ -90,9 +99,24 @@ export default class Person extends React.Component {
 		  name: event.target.value
 		};
 		break;
+	  case 'formDepartment':
+		state_update = {
+		  name: event.target.value
+		};
+		break;
 	  case 'formWorkplace':
 		state_update = {
 		  workplace: event.target.value
+		};
+		break;
+	  case 'formComplementWorkplace':
+		state_update = {
+		  complementWorkplace: event.target.value
+		};
+		break;
+	  case 'formLocalContact':
+		state_update = {
+		  localContact: event.target.value
 		};
 		break;
 	  case 'formPhone':
@@ -116,15 +140,21 @@ export default class Person extends React.Component {
 
 	event.preventDefault();
 
-	/* console.log(event.target.id); */
-	/* console.log(event.target); */
-
 	switch(event.target.id) {
 	  case 'btnName':
 		input_text = 'formName';
 		break;
+	  case 'btnDepartment':
+		input_text = 'formDepartment';
+		break;
 	  case 'btnWorkplace':
 		input_text = 'formWorkplace';
+		break;
+	  case 'btnComplementWorkplace':
+		input_text = 'formComplementWorkplace';
+		break;
+	  case 'btnLocalContact':
+		input_text = 'formLocalContact';
 		break;
 	  case 'btnPhone':
 		input_text = 'formPhone';
@@ -181,17 +211,39 @@ export default class Person extends React.Component {
 			<Button id="btnName" variant="warning" onClick={this.handleEdit} className="bi bi-pencil-square"></Button>
 		  </InputGroup>
 		</Form.Group>
-		<Form.Group className="mb-3" controlId="formWorkplace">
-		  <Form.Label>Unidade/Local de Trabalho</Form.Label>
+		<Form.Group className="mb-3" controlId="formDepartment">
+		  <Form.Label>Secretaria</Form.Label>
 		  <InputGroup className="mb-3">
-			<Form.Control type="text" placeholder="Local onde está o seu equipamento" disabled className={this.state.validate_class_name} onChange={this.handleChange} value={this.state.workplace} />
+			<Form.Control type="text" placeholder="Secretaria Vinculada" disabled className={this.state.validate_class_name} onChange={this.handleChange} value={this.state.department} />
+			<Button id="btnDepartment" variant="warning" onClick={this.handleEdit} className="bi bi-pencil-square"></Button>
+		  </InputGroup>
+		</Form.Group>
+		<Form.Group className="mb-3" controlId="formWorkplace">
+		  <Form.Label>Local da Solicitação</Form.Label>
+		  <InputGroup className="mb-3">
+			<Form.Control type="text" placeholder="Local onde está o seu equipamento" disabled className={this.state.validate_class_name} onChange={this.handleChange} value={this.state.workplace} required />
 			<Button id="btnWorkplace" variant="warning" onClick={this.handleEdit} className="bi bi-pencil-square"></Button>
+		  </InputGroup>
+		</Form.Group>
+		<Form.Group className="mb-3" controlId="formComplementWorkplace">
+		  <Form.Label>Complemento do Local da Solicitação</Form.Label>
+		  <InputGroup className="mb-3">
+			<Form.Control type="text" placeholder="Local específico dentro da unidade" disabled className={this.state.validate_class_name} onChange={this.handleChange} value={this.state.complementWorkplace} />
+			<Button id="btnComplementWorkplace" variant="warning" onClick={this.handleEdit} className="bi bi-pencil-square"></Button>
+		  </InputGroup>
+		  <Form.Text className="text-muted">Caso a unidade seja grande o complemento nos ajuda a localizar o seu equipamento</Form.Text>
+		</Form.Group>
+		<Form.Group className="mb-3" controlId="formLocalContact">
+		  <Form.Label>Contato no Local</Form.Label>
+		  <InputGroup className="mb-3">
+			<Form.Control type="tel" placeholder="Caso não seja você, indique a pessoa para nossa equipe manter o contato" disabled className={this.state.validate_class_name} onChange={this.handleChange} value={this.state.localContact} />
+			<Button id="btnLocalContact" variant="warning" onClick={this.handleEdit} className="bi bi-pencil-square"></Button>
 		  </InputGroup>
 		</Form.Group>
 		<Form.Group className="mb-3" controlId="formPhone">
 		  <Form.Label>Telefone/Ramal Corporativo</Form.Label>
 		  <InputGroup className="mb-3">
-			<Form.Control type="text" placeholder="Telefone da Prefeitura" disabled className={this.state.validate_class_name} onChange={this.handleChange} value={this.state.phone} />
+			<Form.Control type="text" placeholder="Telefone da Prefeitura" disabled className={this.state.validate_class_name} onChange={this.handleChange} value={this.state.phone} required />
 			<Button id="btnPhone" variant="warning" onClick={this.handleEdit} className="bi bi-pencil-square"></Button>
 		  </InputGroup>
 		</Form.Group>

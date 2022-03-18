@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './index.css';
 import App from './App';
 import Search from './otrs/Search';
-import Login from './auth/Login'
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -15,7 +14,6 @@ ReactDOM.render(
 	  <Routes>
 		<Route path="/" element={<App />} />
 		<Route path="pesquisar" element={<Search />} />
-		<Route path="login" element={<Login />} />
 		<Route path="*" element={<App />} />
 	  </Routes>
 	</BrowserRouter>

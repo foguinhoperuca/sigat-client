@@ -5,26 +5,53 @@ export default class Issue extends React.Component {
   constructor(props) {
 	super(props);
 	this.state = {
-	  service: '',
-	  description: ''
+	  services: [],
+	  comment: ''
 	};
+
+	/* this.handleServices = this.handleServices.bind(this); */
+	this.handleServiceChange = this.handleServiceChange.bind(this);
+  }
+
+  componentDidMount() {
+	let url = `/sigat-api/otrs/services/index`
+
+	fetch(url)
+	  .then(response => response.json())
+	  .then(data => {
+		this.setState({
+		  services: data
+		});
+	  });
+  }
+
+  handleServiceChange(event) {
+	event.preventDefault();
+
+	const service = document.getElementById('formService').value;
+	this.setState((state, props) => ({
+	  comment: (document.getElementById('formService').value === 0) ? '' : state.services[service - 1].comments
+	}));
   }
 
   render() {
+	const options = this.state.services.map((service) => {
+	  return <option key={service.id} value={service.id}>[{service.general_catalog.name}] {service.name}</option>
+	});
+
 	return (
 	  <div>
 		<Form.Group className="mb-3" controlId="formService">
-		  <Form.Select aria-label="Default select example">
-			<option>--- Informe o Serviço Desejado da TI **Se Souber** ---</option>
-			<option value="1">Administrativo</option>
-			<option value="2">Redes</option>
-			<option value="3">Sistemas Internos e Legados</option>
-			<option value="4">Sistemas de Terceiros</option>
-			<option value="5">Suporte Técnico</option>
-			<option value="6">Telefonia</option>
-		  </Form.Select>
 		  <Form.Text className="text-muted">
 			Os serviços da TI são uma forma mais simples de encaminharmos para equipe correta atender o seu chamado. É opcional!
+		  </Form.Text>
+		  <br />
+		  <Form.Select aria-label="Default select example" onChange={this.handleServiceChange}>
+			<option value="0">--- Informe o Serviço Desejado da TI **Se Souber** ---</option>
+			{options}
+		  </Form.Select>
+		  <Form.Text className="text-muted">
+			{this.state.comment}
 		  </Form.Text>
 		</Form.Group>
 		<Form.Group className="mb-3" controlId="formDescription">

@@ -1,5 +1,4 @@
 import React from 'react';
-import logopms from '../images/logo_pms.png';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -193,7 +192,7 @@ export default class UserBadge extends React.Component {
 
 	return (
 	  <div>
-		{button}&nbsp;<a onClick={this.handleProtectedData} className="btn btn-warning">Protegido</a>&nbsp;<a onClick={this.handleUnprotectedData} className="btn btn-secondary">Desprotegido</a>
+		{button}&nbsp;<Button onClick={this.handleProtectedData} variant="warning">Protegido</Button>&nbsp;<Button onClick={this.handleUnprotectedData} variant="secondary">Desprotegido</Button>
 	  </div>
 	);
   }

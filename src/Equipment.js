@@ -18,6 +18,30 @@ export default class Equipment extends React.Component {
 	this.handleSubmit = this.handleSubmit.bind(this);
 	this.handleSearch = this.handleSearch.bind(this);
   }
+
+  componentDidMount() {
+	if (this.state.numRegistro !== undefined) {
+	  let patr = `/gestaoti/reports/show_sim_assets/${this.state.numRegistro}.json`
+
+	  fetch(patr)
+		.then(response => response.json())
+		.then(data => {
+		  if (data["numRegistro"] === undefined) {
+			this.setState({
+			  validate_class_name: "is-invalid",
+			  descrBem: "Patrimônio não encontrado!"
+			});
+		  } else {
+			this.setState({
+			  numRegistro: data["numRegistro"],
+			  descrBem: data["descrBem"],
+			  isValid: true,
+			  validate_class_name: "is-valid"
+			})	
+		  }
+		});
+	}
+  }
   
   handleChange(event) {
 	this.setState({

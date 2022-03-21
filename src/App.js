@@ -160,13 +160,10 @@ Descrição: ${description}`);
 
   handleMultipleEquipments(event) {
 	event.preventDefault();
-	console.log("Handling multiple equipments");
 
 	let eqps = document.getElementById("txtEquipmentList").value.split("\n").map((eqp, index) => {
-	  console.log(eqp);
 	  return <Equipment numRegistro={eqp} />
 	});
-	console.log(eqps);
 
 	this.setState(function(state, props) {
 	  return {

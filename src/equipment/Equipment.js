@@ -47,14 +47,14 @@ export default class Equipment extends React.Component {
 		});
 	}
   }
-  
+
   handleChange(event) {
 	this.setState({
 	  numRegistro: event.target.value,
 	  descrBem: null
 	});
   }
-  
+
   handleSubmit(event) {
 	event.preventDefault();
 
@@ -102,12 +102,11 @@ export default class Equipment extends React.Component {
 			<InputGroup.Text id="basic-addon1" onClick={this.handleSearch}>pms-</InputGroup.Text>
 			<FormControl
 			placeholder="Patrimônio"
-			aria-label="Patrimônio"
+			name="txtEquipment"
 			onChange={this.handleChange}
 			disabled={this.state.isValid}
 			className={this.state.validate_class_name}
 			value={this.state.numRegistro}
-			name="txtEquipment"
 			required
 			/>
 			<Button disabled={this.state.isValid} variant="info" onClick={this.handleSubmit}>

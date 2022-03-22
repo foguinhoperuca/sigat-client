@@ -30,7 +30,9 @@ export default class App extends React.Component {
 		<Equipment />
 	  ],
 	  showEquipmentDialog: false,
-	  addListMessage: ''
+	  addListMessage: '',
+	  service: 0,
+	  description: ''
 	};
 
 	this.handleLink = this.handleLink.bind(this);
@@ -43,10 +45,14 @@ export default class App extends React.Component {
 	this.generateEquipmentList = this.generateEquipmentList.bind(this);
 	this.cleanEquipmentList = this.cleanEquipmentList.bind(this);
 	this.handleMultipleEquipments = this.handleMultipleEquipments.bind(this);
+
+	this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
+	this.handleServiceChange = this.handleServiceChange.bind(this);
   }
 
   handleLink(event) {
 	/* TODO lift up children props */
+	/* TODO use uncontrolled components to get data */
 	let username = document.getElementById('formBasicEmail').value;
 	let name = document.getElementById('formName').value;
 	let department = document.getElementById('formDepartment').value;
@@ -173,6 +179,14 @@ Descrição: ${description}`);
 	});
   }
 
+  handleDescriptionChange(descr) {
+	this.setState({description: descr});
+  }
+
+  handleServiceChange(service) {
+	this.setState({service: service});
+  }
+
   render() {
 	return (
 	  <div className="App">
@@ -263,7 +277,7 @@ Descrição: ${description}`);
 		  </Modal>
 		  {this.state.equipments}
 		  <h3 id="hdrIssue">Solicitação</h3>
-		  <Issue />
+		  <Issue service={this.state.service} onServiceChange={this.handleServiceChange} description={this.state.description} onDescriptionChange={this.handleDescriptionChange} />
 		</Form>
 	  </div>
 	);

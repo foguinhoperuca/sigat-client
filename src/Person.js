@@ -35,6 +35,8 @@ export default class Person extends React.Component {
 	/* TODO handle errors here and in backend! */
 	let url = `/rci/events/filter_by_login.json?login=${this.state.username}&limit=1`;
 
+	/* TODO use state to show a spinner <Spinner animation="border" role="status" variant="info" size="sm"><span className="visually-hidden">Loading...</span></Spinner> */
+
 	fetch(url)
 	  .then(response => response.json())
 	  .then(data => {

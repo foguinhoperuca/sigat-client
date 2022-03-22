@@ -3,6 +3,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
+import Spinner from 'react-bootstrap/Spinner';
 
 export default class Equipment extends React.Component {
   constructor(props) {
@@ -21,7 +22,11 @@ export default class Equipment extends React.Component {
 
   componentDidMount() {
 	if (this.state.numRegistro !== undefined) {
-	  let patr = `/gestaoti/reports/show_sim_assets/${this.state.numRegistro}.json`
+	  let patr = `/gestaoti/reports/show_sim_assets/${this.state.numRegistro}.json`;
+
+	  this.setState({
+		descrBem: <Spinner animation="border" role="status" variant="info" size="sm"><span className="visually-hidden">Loading...</span></Spinner>
+	  });
 
 	  fetch(patr)
 		.then(response => response.json())
@@ -37,7 +42,7 @@ export default class Equipment extends React.Component {
 			  descrBem: data["descrBem"],
 			  isValid: true,
 			  validate_class_name: "is-valid"
-			})	
+			});
 		  }
 		});
 	}
@@ -53,7 +58,11 @@ export default class Equipment extends React.Component {
   handleSubmit(event) {
 	event.preventDefault();
 
-	let patr = `/gestaoti/reports/show_sim_assets/${this.state.numRegistro}.json`
+	let patr = `/gestaoti/reports/show_sim_assets/${this.state.numRegistro}.json`;
+
+	this.setState({
+	  descrBem: <Spinner animation="border" role="status" variant="info" size="sm"><span className="visually-hidden">Loading...</span></Spinner>
+	});
 
 	fetch(patr)
 	  .then(response => response.json())
@@ -69,7 +78,7 @@ export default class Equipment extends React.Component {
 			descrBem: data["descrBem"],
 			isValid: true,
 			validate_class_name: "is-valid"
-		  })	
+		  });
 		}
 	  });
   }

@@ -32,6 +32,12 @@ export default class App extends React.Component {
 	  ],
 	  showEquipmentDialog: false,
 	  addListMessage: '',
+
+	  username: '',
+	  name: '',
+	  department: '',
+	  phone: '',
+	  whatsapp: '',
 	  workplace: '',
 	  complementWorkplace: '',
 	  localContact: '',
@@ -50,6 +56,11 @@ export default class App extends React.Component {
 	this.cleanEquipmentList = this.cleanEquipmentList.bind(this);
 	this.handleMultipleEquipments = this.handleMultipleEquipments.bind(this);
 
+	this.handleUsernameChange = this.handleUsernameChange.bind(this);
+	this.handleNameChange = this.handleNameChange.bind(this);
+	this.handleDepartmentChange = this.handleDepartmentChange.bind(this);
+	this.handlePhoneChange = this.handlePhoneChange.bind(this);
+	this.handleWhatsappChange = this.handleWhatsappChange.bind(this);
 	this.handleWorkplaceChange = this.handleWorkplaceChange.bind(this);
 	this.handleComplementWorkplaceChange = this.handleComplementWorkplaceChange.bind(this);
 	this.handleLocalContactChange = this.handleLocalContactChange.bind(this);
@@ -60,11 +71,6 @@ export default class App extends React.Component {
   handleLink(event) {
 	/* TODO lift up children props */
 	/* TODO use uncontrolled components to get data */
-	let username = document.getElementById('formBasicEmail').value;
-	let name = document.getElementById('formName').value;
-	let department = document.getElementById('formDepartment').value;
-	let phone = document.getElementById('formPhone').value;
-	let whatsapp = document.getElementById('formWhatsapp').value;
 	let equipment = "";
 	document.getElementsByName("txtEquipment").forEach((eqpmnt, index) => {
 	  equipment = equipment.concat("pms-", eqpmnt.value, " :: ");
@@ -73,13 +79,13 @@ export default class App extends React.Component {
 
 	let service_descr = document.getElementById('formService').options[document.getElementById('formService').selectedIndex].text;
 	let subject = `Suporte Técnico ${service_descr}`;
-	let body = encodeURI(`Responsável Abertura Chamado: ${name} (${username}@sorocaba.sp.gov.br)
-Secretaria: ${department}
+	let body = encodeURI(`Responsável Abertura Chamado: ${this.state.name} (${this.state.username}@sorocaba.sp.gov.br)
+Secretaria: ${this.state.department}
 Local da Solicitação: ${this.state.workplace}
 Complemento do Local da Solicitação: ${this.state.complementWorkplace}
 Contato no Local: ${this.state.localContact}
-Telefone Corporativo: ${phone}
-Whatsapp: ${whatsapp}
+Telefone Corporativo: ${this.state.phone}
+Whatsapp: ${this.state.whatsapp}
 Patrimônio(s): ${equipment}
 Serviço TI: (${this.state.service}) - ${service_descr}
 Descrição: ${this.state.description}`);
@@ -182,6 +188,26 @@ Descrição: ${this.state.description}`);
 	});
   }
 
+  handleUsernameChange(value) {
+	this.setState({username: value});
+  }
+
+  handleNameChange(value) {
+	this.setState({name: value});
+  }
+
+  handleDepartmentChange(value) {
+	this.setState({department: value});
+  }
+
+  handlePhoneChange(value) {
+	this.setState({phone: value});
+  }
+
+  handleWhatsappChange(value) {
+	this.setState({whatsapp: value});
+  }
+
   handleWorkplaceChange(value) {
 	this.setState({workplace: value});
   }
@@ -236,7 +262,13 @@ Descrição: ${this.state.description}`);
 		</Navbar>
 		<Form className="container" action={this.state.issue} onSubmit={this.handleLink}>
 		  <h3 id="hdrPerson">Informações</h3>
-		  <Person />
+		  <Person
+			username={this.state.username} onUsernameChange={this.handleUsernameChange}
+			name={this.state.name} onNameChange={this.handleNameChange}
+			department={this.state.department} onDepartmentChange={this.handleDepartmentChange}
+			phone={this.state.phone} onPhoneChange={this.handlePhoneChange}
+			whatsapp={this.state.whatsapp} onWhatsappChange={this.handleWhatsappChange}
+		  />
 		  <h3 id="hdrLocation">Unidade</h3>
 		  <Location
 			workplace={this.state.workplace} onWorkplaceChange={this.handleWorkplaceChange}
@@ -299,7 +331,10 @@ Descrição: ${this.state.description}`);
 		  </Modal>
 		  {this.state.equipments}
 		  <h3 id="hdrIssue">Solicitação</h3>
-		  <Issue service={this.state.service} onServiceChange={this.handleServiceChange} description={this.state.description} onDescriptionChange={this.handleDescriptionChange} />
+		  <Issue
+			service={this.state.service} onServiceChange={this.handleServiceChange}
+			description={this.state.description} onDescriptionChange={this.handleDescriptionChange}
+		  />
 		</Form>
 	  </div>
 	);

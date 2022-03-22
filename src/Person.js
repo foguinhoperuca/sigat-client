@@ -3,6 +3,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
+import Spinner from 'react-bootstrap/Spinner';
 
 export default class Person extends React.Component {
   constructor(props) {
@@ -11,14 +12,12 @@ export default class Person extends React.Component {
 	  username: '',
 	  name: '',
 	  department: '',
-	  workplace: '',
-	  complementWorkplace: '',
-	  localContact: '',
 	  phone: '',
 	  whatsapp: '',
 	  isValid: false,
 	  isValidComplement: true,
-	  validate_class_name: null
+	  validate_class_name: null,
+	  searchMessage: ''
 	};
 
 	this.handleSubmit = this.handleSubmit.bind(this);
@@ -33,10 +32,9 @@ export default class Person extends React.Component {
 	event.preventDefault();
 
 	/* TODO handle errors here and in backend! */
-	let url = `/rci/events/filter_by_login.json?login=${this.state.username}&limit=1`;
+	let url = `/rci/events/filter_by_login.json?login=${this.props.username}&limit=1`;
 
-	/* TODO use state to show a spinner <Spinner animation="border" role="status" variant="info" size="sm"><span className="visually-hidden">Loading...</span></Spinner> */
-
+	this.setState({searchMessage: <Spinner animation="border" role="status" variant="info" size="sm"><span className="visually-hidden">Loading...</span></Spinner>});
 	fetch(url)
 	  .then(response => response.json())
 	  .then(data => {
@@ -46,23 +44,25 @@ export default class Person extends React.Component {
 		   console.log(data[0] === undefined); */
 		if (data[0] === undefined) {
 		  this.setState({
-			name: '',
-			department: '',
-			phone: '',
-			whatsapp: '',
 			isValid: false,
-			validate_class_name: "is-invalid"
+			validate_class_name: "is-invalid",
+			searchMessage: 'Usuário não encontrado!!'
 		  });
+		  this.props.onNameChange('');
+		  this.props.onDepartmentChange('');
+		  this.props.onPhoneChange('');
+		  this.props.onWhatsappChange('');
 		} else {
-		  /* TODO implement API to get phone and whatsapp data! */
+		  console.log("TODO implement API to get phone and whatsapp data!");
 		  this.setState({
-			name: data[0]["NOME_USUARIO"],
-			department: data[0]["LOTACAO_USUARIO"],
-			phone: '',
-			whatsapp: '',
 			isValid: true,
-			validate_class_name: "is-valid"
+			validate_class_name: "is-valid",
+			searchMessage: 'Dados carregados com sucesso!!'
 		  });
+		  this.props.onNameChange(data[0]["NOME_USUARIO"]);
+		  this.props.onDepartmentChange(data[0]["LOTACAO_USUARIO"]);
+		  this.props.onPhoneChange('');
+		  this.props.onWhatsappChange('');
 		}
 	  });
   }
@@ -76,44 +76,33 @@ export default class Person extends React.Component {
 	this.setState({
 	  isValid: false,
 	  validate_class_name: null,
-	  username: ''
-	  /* TODO handle all other fields here?! */
+	  searchMessage: ''
 	});
+
+	/* TODO handle all other fields here?! */
+	this.props.onUsernameChange('');
   }
 
   handleChange(event) {
-	let state_update;
-
 	switch(event.target.id) {
 	  case 'formBasicEmail':
-		state_update = {
-		  username: event.target.value
-		};
+		this.props.onUsernameChange(event.target.value);
 		break;
 	  case 'formName':
-		state_update = {
-		  name: event.target.value
-		};
+		this.props.onNameChange(event.target.value);
 		break;
 	  case 'formDepartment':
-		state_update = {
-		  name: event.target.value
-		};
+		this.props.onDepartmentChange(event.target.value);
 		break;
 	  case 'formPhone':
-		state_update = {
-		  phone: event.target.value
-		};
+		this.props.onPhoneChange(event.target.value);
 		break;
 	  case 'formWhatsapp':
-		state_update = {
-		  whatsapp: event.target.value
-		};
+		this.props.onWhatsappChange(event.target.value);
 		break;
 	  default:
 		console.error("Not found person field to handle change!!");
 	}
-	this.setState(state_update);
   }
   
   handleEdit(event) {
@@ -168,39 +157,40 @@ export default class Person extends React.Component {
 		<Form.Group className="mb-3" controlId="formBasicEmail">
 		  <Form.Label>E-mail</Form.Label>
 		  <InputGroup className="mb-3">
-			<FormControl placeholder="Usuário da Rede" aria-label="Usuário da Rede" aria-describedby="basic-addon2" onChange={this.handleChange} disabled={this.state.isValid} className={this.state.validate_class_name} value={this.state.username} required />
+			<FormControl placeholder="Usuário da Rede" aria-label="Usuário da Rede" aria-describedby="basic-addon2" onChange={this.handleChange} disabled={this.state.isValid} className={this.state.validate_class_name} value={this.props.username} required />
 			<InputGroup.Text id="basic-addon2" onClick={this.handleSearch}>@sorocaba.sp.gov.br</InputGroup.Text>
 			<Button variant="info" disabled={this.state.isValid} onClick={this.handleSubmit}><span className="bi bi-search"></span></Button>
 			<Button id="btnEditSearch" variant="warning" onClick={this.handleSearch} className="bi bi-pencil-square"></Button>
 		  </InputGroup>
-		  {(this.state.validate_class_name == null) ? '' : (this.state.isValid ? 'Dados carregados com sucesso!!' : 'Usuário não encontrado!!')}<br />
-	  <Form.Text className="text-muted">Confirme os seus dados abaixo antes de enviar o chamado!</Form.Text>
+		  {this.state.searchMessage}
+		  <br />
+		  <Form.Text className="text-muted">Confirme os seus dados abaixo antes de enviar o chamado!</Form.Text>
 		</Form.Group>
 		<Form.Group className="mb-3" controlId="formName">
 		  <Form.Label>Nome</Form.Label>
 		  <InputGroup className="mb-3">
-			<Form.Control type="text" placeholder="Nome Completo" disabled className={this.state.validate_class_name} onChange={this.handleChange} value={this.state.name} />
+			<Form.Control type="text" placeholder="Nome Completo" disabled className={this.state.validate_class_name} onChange={this.handleChange} value={this.props.name} />
 			<Button id="btnName" variant="warning" onClick={this.handleEdit} className="bi bi-pencil-square"></Button>
 		  </InputGroup>
 		</Form.Group>
 		<Form.Group className="mb-3" controlId="formDepartment">
 		  <Form.Label>Secretaria</Form.Label>
 		  <InputGroup className="mb-3">
-			<Form.Control type="text" placeholder="Secretaria Vinculada" disabled className={this.state.validate_class_name} onChange={this.handleChange} value={this.state.department} />
+			<Form.Control type="text" placeholder="Secretaria Vinculada" disabled className={this.state.validate_class_name} onChange={this.handleChange} value={this.props.department} />
 			<Button id="btnDepartment" variant="warning" onClick={this.handleEdit} className="bi bi-pencil-square"></Button>
 		  </InputGroup>
 		</Form.Group>
 		<Form.Group className="mb-3" controlId="formPhone">
 		  <Form.Label>Telefone/Ramal Corporativo</Form.Label>
 		  <InputGroup className="mb-3">
-			<Form.Control type="text" placeholder="Telefone da Prefeitura" disabled className={this.state.validate_class_name} onChange={this.handleChange} value={this.state.phone} required />
+			<Form.Control type="text" placeholder="Telefone da Prefeitura" disabled className={this.state.validate_class_name} onChange={this.handleChange} value={this.props.phone} required />
 			<Button id="btnPhone" variant="warning" onClick={this.handleEdit} className="bi bi-pencil-square"></Button>
 		  </InputGroup>
 		</Form.Group>
 		<Form.Group className="mb-3" controlId="formWhatsapp">
 		  <Form.Label>Whatsapp</Form.Label>
 		  <InputGroup className="mb-3">
-			<Form.Control type="tel" placeholder="Para agilizar o contato" disabled className={this.state.validate_class_name} onChange={this.handleChange} value={this.state.whatsapp} />
+			<Form.Control type="tel" placeholder="Para agilizar o contato" disabled className={this.state.validate_class_name} onChange={this.handleChange} value={this.props.whatsapp} />
 			<Button id="btnWhatsapp" variant="warning" onClick={this.handleEdit} className="bi bi-pencil-square"></Button>
 		  </InputGroup>
 		</Form.Group>

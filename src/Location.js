@@ -37,8 +37,6 @@ export default class Location extends React.Component {
 
   
   handleChange(event) {
-	let state_update;
-
 	switch(event.target.id) {
 	  case 'formLocation_Workplace':
 		this.props.onWorkplaceChange(event.target.value);
@@ -52,7 +50,6 @@ export default class Location extends React.Component {
 	  default:
 		console.error("Not found location field to handle change!!");
 	}
-	/* this.setState(state_update); */
   }
 
   handleEdit(event) {

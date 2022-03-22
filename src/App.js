@@ -2,6 +2,7 @@ import React from 'react';
 import './App.css';
 import Equipment from './Equipment';
 import Person from './Person';
+import Location from './Location';
 import Issue from './Issue';
 import UserBadge from './auth/UserBadge';
 import Form from 'react-bootstrap/Form';
@@ -31,6 +32,9 @@ export default class App extends React.Component {
 	  ],
 	  showEquipmentDialog: false,
 	  addListMessage: '',
+	  workplace: '',
+	  complementWorkplace: '',
+	  localContact: '',
 	  service: 0,
 	  description: ''
 	};
@@ -46,6 +50,9 @@ export default class App extends React.Component {
 	this.cleanEquipmentList = this.cleanEquipmentList.bind(this);
 	this.handleMultipleEquipments = this.handleMultipleEquipments.bind(this);
 
+	this.handleWorkplaceChange = this.handleWorkplaceChange.bind(this);
+	this.handleComplementWorkplaceChange = this.handleComplementWorkplaceChange.bind(this);
+	this.handleLocalContactChange = this.handleLocalContactChange.bind(this);
 	this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
 	this.handleServiceChange = this.handleServiceChange.bind(this);
   }
@@ -56,9 +63,6 @@ export default class App extends React.Component {
 	let username = document.getElementById('formBasicEmail').value;
 	let name = document.getElementById('formName').value;
 	let department = document.getElementById('formDepartment').value;
-	let workplace = document.getElementById('formWorkplace').value;
-	let complementWorkplace = document.getElementById('formComplementWorkplace').value;
-	let localContact = document.getElementById('formLocalContact').value;
 	let phone = document.getElementById('formPhone').value;
 	let whatsapp = document.getElementById('formWhatsapp').value;
 	let equipment = "";
@@ -66,20 +70,19 @@ export default class App extends React.Component {
 	  equipment = equipment.concat("pms-", eqpmnt.value, " :: ");
 	});
 	equipment = equipment.replace(/ :: $/, "");
-	let service = document.getElementById('formService').options[document.getElementById('formService').selectedIndex].text;
-	let description = document.getElementById('formDescription').value;
 
-	let subject = `Suporte Técnico ${service}`;
+	let service_descr = document.getElementById('formService').options[document.getElementById('formService').selectedIndex].text;
+	let subject = `Suporte Técnico ${service_descr}`;
 	let body = encodeURI(`Responsável Abertura Chamado: ${name} (${username}@sorocaba.sp.gov.br)
 Secretaria: ${department}
-Local da Solicitação: ${workplace}
-Complemento do Local da Solicitação: ${complementWorkplace}
-Contato no Local: ${localContact}
+Local da Solicitação: ${this.state.workplace}
+Complemento do Local da Solicitação: ${this.state.complementWorkplace}
+Contato no Local: ${this.state.localContact}
 Telefone Corporativo: ${phone}
 Whatsapp: ${whatsapp}
 Patrimônio(s): ${equipment}
-Serviço TI: ${service}
-Descrição: ${description}`);
+Serviço TI: (${this.state.service}) - ${service_descr}
+Descrição: ${this.state.description}`);
 
 	this.setState({
 	  issue: `mailto:informatica@sorocaba.sp.gov.br?subject=${subject}&body=${body}`
@@ -179,6 +182,18 @@ Descrição: ${description}`);
 	});
   }
 
+  handleWorkplaceChange(value) {
+	this.setState({workplace: value});
+  }
+
+  handleComplementWorkplaceChange(value) {
+	this.setState({complementWorkplace: value});
+  }
+
+  handleLocalContactChange(value) {
+	this.setState({localContact: value});
+  }
+
   handleDescriptionChange(descr) {
 	this.setState({description: descr});
   }
@@ -203,6 +218,7 @@ Descrição: ${description}`);
 			<Navbar.Collapse id="basic-navbar-nav">
 			  <Nav className="me-auto">
 				<Nav.Link href="#hdrPerson">Informações</Nav.Link>
+				<Nav.Link href="#hdrLocation">Unidade</Nav.Link>
 				<Nav.Link href="#hdrEquipments">Equipamentos</Nav.Link>
 				<Nav.Link href="#hdrIssue">Solicitação</Nav.Link>
 				<a onClick={this.handleLink} className="btn btn-success" href={this.state.issue} target="_blank" rel="noopener noreferrer">Enviar</a>
@@ -221,6 +237,12 @@ Descrição: ${description}`);
 		<Form className="container" action={this.state.issue} onSubmit={this.handleLink}>
 		  <h3 id="hdrPerson">Informações</h3>
 		  <Person />
+		  <h3 id="hdrLocation">Unidade</h3>
+		  <Location
+			workplace={this.state.workplace} onWorkplaceChange={this.handleWorkplaceChange}
+			complementWorkplace={this.state.complementWorkplace} onComplementWorkplaceChange={this.handleComplementWorkplaceChange}
+			localContact={this.state.localContact} onLocalContactChange={this.handleLocalContactChange}
+		  />
 		  <h3 id="hdrEquipments">Equipamentos</h3>
 		  <span className="btn btn-success btn-sm" onClick={this.handleEquipmentAdd}><span className="bi bi-plus-square"></span></span>&nbsp;<span className="btn btn-danger btn-sm" onClick={this.handleEquipmentDelete}><span className="bi bi-trash"></span></span>&nbsp;<span className="btn btn-primary btn-sm" onClick={this.openEquipmentDialog}><span className="bi bi-list"></span></span>
 		  <br />

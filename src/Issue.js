@@ -4,11 +4,10 @@ import Form from 'react-bootstrap/Form';
 export default class Issue extends React.Component {
   constructor(props) {
 	super(props);
+	/* TODO this must be a reactjs controlled component?! */
 	this.state = {
 	  services: [],
-	  comment: '',
-	  service: '',
-	  description: ''
+	  comment: ''
 	};
 
 	/* this.handleServices = this.handleServices.bind(this); */
@@ -29,21 +28,21 @@ export default class Issue extends React.Component {
 	  });
   }
 
+  /* TODO setup one handleChange only */
   handleServiceChange(event) {
 	event.preventDefault();
 
 	const service = event.target.value;
 	this.setState((state, props) => ({
 	  comment: (Number(service) === 0) ? '' : state.services[service - 1].comments
-	  /* service: service */
 	}));
 
-	this.props.onServiceChange(service);
+	this.props.onServiceChange('service', service);
   }
 
   handleChange(event) {
 	event.preventDefault();
-	this.props.onDescriptionChange(event.target.value);
+	this.props.onServiceChange('description', event.target.value);
   }
 
   render() {

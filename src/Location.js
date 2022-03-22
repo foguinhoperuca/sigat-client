@@ -39,13 +39,13 @@ export default class Location extends React.Component {
   handleChange(event) {
 	switch(event.target.id) {
 	  case 'formLocation_Workplace':
-		this.props.onWorkplaceChange(event.target.value);
+		this.props.onWorkplaceChange('workplace', event.target.value);
 		break;
 	  case 'formLocation_ComplementWorkplace':
-		this.props.onComplementWorkplaceChange(event.target.value);
+		this.props.onComplementWorkplaceChange('complementWorkplace', event.target.value);
 		break;
 	  case 'formLocation_LocalContact':
-		this.props.onLocalContactChange(event.target.value);
+		this.props.onLocalContactChange('localContact', event.target.value);
 		break;
 	  default:
 		console.error("Not found location field to handle change!!");

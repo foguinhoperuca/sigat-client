@@ -48,6 +48,8 @@ export default class App extends React.Component {
 	this.handleEquipmentAddMultiple = this.handleEquipmentAddMultiple.bind(this);
 
 	/* TODO implement in one fuction only using this.setState({[name]: value}); */
+	this.handleProp = this.handleProp.bind(this);
+
 	this.handleUsernameChange = this.handleUsernameChange.bind(this);
 	this.handleNameChange = this.handleNameChange.bind(this);
 	this.handleDepartmentChange = this.handleDepartmentChange.bind(this);
@@ -56,8 +58,6 @@ export default class App extends React.Component {
 	this.handleWorkplaceChange = this.handleWorkplaceChange.bind(this);
 	this.handleComplementWorkplaceChange = this.handleComplementWorkplaceChange.bind(this);
 	this.handleLocalContactChange = this.handleLocalContactChange.bind(this);
-	this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
-	this.handleServiceChange = this.handleServiceChange.bind(this);
   }
 
   handleLink(event) {
@@ -120,6 +120,10 @@ Descrição: ${this.state.description}`);
   }
 
   /* TODO all handle <props> Change must be inside one function */
+  handleProp(prop, value) {
+	this.setState({[prop]: value});
+  }
+
   handleUsernameChange(value) {
 	this.setState({username: value});
   }
@@ -150,14 +154,6 @@ Descrição: ${this.state.description}`);
 
   handleLocalContactChange(value) {
 	this.setState({localContact: value});
-  }
-
-  handleDescriptionChange(value) {
-	this.setState({description: value});
-  }
-
-  handleServiceChange(value) {
-	this.setState({service: value});
   }
 
   render() {
@@ -203,9 +199,9 @@ Descrição: ${this.state.description}`);
 		  />
 		  <h3 id="hdrLocation">Unidade</h3>
 		  <Location
-			workplace={this.state.workplace} onWorkplaceChange={this.handleWorkplaceChange}
-			complementWorkplace={this.state.complementWorkplace} onComplementWorkplaceChange={this.handleComplementWorkplaceChange}
-			localContact={this.state.localContact} onLocalContactChange={this.handleLocalContactChange}
+			workplace={this.state.workplace} onWorkplaceChange={this.handleProp}
+			complementWorkplace={this.state.complementWorkplace} onComplementWorkplaceChange={this.handleProp}
+			localContact={this.state.localContact} onLocalContactChange={this.handleProp}
 		  />
 		  <h3 id="hdrEquipments">Equipamentos</h3>
 		  <MultipleEquipmentForm
@@ -217,8 +213,8 @@ Descrição: ${this.state.description}`);
 		  {this.state.equipments}
 		  <h3 id="hdrIssue">Solicitação</h3>
 		  <Issue
-			service={this.state.service} onServiceChange={this.handleServiceChange}
-			description={this.state.description} onDescriptionChange={this.handleDescriptionChange}
+			service={this.state.service} onServiceChange={this.handleProp}
+			description={this.state.description} onDescriptionChange={this.handleProp}
 		  />
 		</Form>
 	  </div>

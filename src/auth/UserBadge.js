@@ -1,7 +1,8 @@
 import React from 'react';
+import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import Badge from 'react-bootstrap/Badge';
 
 export default class UserBadge extends React.Component {
   constructor(props) {
@@ -150,14 +151,15 @@ export default class UserBadge extends React.Component {
 	let button;
 	const user = JSON.parse(localStorage.getItem("user"));
 
+	/* TODO use a good UI (alredy btn btn-primary) with Nav.Link history function */
 	if (isLoggedIn) {
 	  button = <>
-		Olá {user.username}! <a className="btn btn-danger" href="/logout" onClick={this.handleLogout}>Logout</a>
+		Olá <Badge bg="info">{user.username}</Badge>!&nbsp;<a className="btn btn-danger" href="/logout" onClick={this.handleLogout}>Logout <span className="bi bi-door-closed"></span></a>
 	  </>;
 	} else {
 	  button = <>
 		<Button variant="primary" onClick={this.handleShow}>
-          Login
+          Login&nbsp; <span className="bi bi-door-open"></span>
 		</Button>
 		<Modal show={this.state.show} onHide={this.handleClose}>
 		  <Modal.Header closeButton>
@@ -192,7 +194,7 @@ export default class UserBadge extends React.Component {
 
 	return (
 	  <div>
-		{button}&nbsp;<Button onClick={this.handleProtectedData} variant="warning">Protegido</Button>&nbsp;<Button onClick={this.handleUnprotectedData} variant="secondary">Desprotegido</Button>
+		{button}&nbsp;<Button onClick={this.handleProtectedData} variant="outline-warning"><span className="bi bi-door-open"></span></Button>&nbsp;<Button onClick={this.handleUnprotectedData} variant="outline-dark"><span className="bi bi-door-closed"></span></Button>
 	  </div>
 	);
   }

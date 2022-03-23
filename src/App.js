@@ -12,6 +12,7 @@ import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 
 /* import { Link } from "react-router-dom"; */
 
@@ -42,26 +43,31 @@ export default class App extends React.Component {
 
 	this.handleLink = this.handleLink.bind(this);
 	this.handleEquipmentDelete = this.handleEquipmentDelete.bind(this);
-	this.handleEquipmentAdd = this.handleEquipmentAdd.bind(this);
-
-	this.equipmentDialog = this.equipmentDialog.bind(this);
 	this.handleEquipmentAddMultiple = this.handleEquipmentAddMultiple.bind(this);
+	this.handleEquipmentAdd = this.handleEquipmentAdd.bind(this); /* TODO Still need it!? Can I use only Add Multiple!? */
+	this.equipmentDialog = this.equipmentDialog.bind(this);
 
-	/* TODO implement in one fuction only using this.setState({[name]: value}); */
 	this.handleProp = this.handleProp.bind(this);
 
-	this.handleUsernameChange = this.handleUsernameChange.bind(this);
-	this.handleNameChange = this.handleNameChange.bind(this);
-	this.handleDepartmentChange = this.handleDepartmentChange.bind(this);
-	this.handlePhoneChange = this.handlePhoneChange.bind(this);
-	this.handleWhatsappChange = this.handleWhatsappChange.bind(this);
-	this.handleWorkplaceChange = this.handleWorkplaceChange.bind(this);
-	this.handleComplementWorkplaceChange = this.handleComplementWorkplaceChange.bind(this);
-	this.handleLocalContactChange = this.handleLocalContactChange.bind(this);
+	this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleSubmit(event) {
+	const form = event.currentTarget;
+	if (form.checkValidity() === false) {
+	  console.log("checkValidity failed!!");
+	  event.preventDefault();
+	  event.stopPropagation();
+	}
+	console.log("TESTING form validation");
+	console.log(form);
+	console.log(form.checkValidity());
+
+	event.preventDefault();
+	event.stopPropagation();
   }
 
   handleLink(event) {
-	/* TODO lift up children props */
 	/* TODO use uncontrolled components to get data */
 	let equipment = "";
 	document.getElementsByName("txtEquipment").forEach((eqpmnt, index) => {
@@ -124,38 +130,6 @@ Descrição: ${this.state.description}`);
 	this.setState({[prop]: value});
   }
 
-  handleUsernameChange(value) {
-	this.setState({username: value});
-  }
-
-  handleNameChange(value) {
-	this.setState({name: value});
-  }
-
-  handleDepartmentChange(value) {
-	this.setState({department: value});
-  }
-
-  handlePhoneChange(value) {
-	this.setState({phone: value});
-  }
-
-  handleWhatsappChange(value) {
-	this.setState({whatsapp: value});
-  }
-
-  handleWorkplaceChange(value) {
-	this.setState({workplace: value});
-  }
-
-  handleComplementWorkplaceChange(value) {
-	this.setState({complementWorkplace: value});
-  }
-
-  handleLocalContactChange(value) {
-	this.setState({localContact: value});
-  }
-
   render() {
 	return (
 	  <div className="App">
@@ -175,27 +149,24 @@ Descrição: ${this.state.description}`);
 				<Nav.Link href="#hdrLocation">Unidade</Nav.Link>
 				<Nav.Link href="#hdrEquipments">Equipamentos</Nav.Link>
 				<Nav.Link href="#hdrIssue">Solicitação</Nav.Link>
-				<a onClick={this.handleLink} className="btn btn-success" href={this.state.issue} target="_blank" rel="noopener noreferrer">Enviar</a>
+				<a onClick={this.handleLink} className="btn btn-secondary" href={this.state.issue} target="_blank" rel="noopener noreferrer">Enviar por E-mail</a>
 			  </Nav>
 			  {/* FIXME disabled for now... */}
-			  {/* <Nav>
-				  <Nav.Link as={Link} to="/pesquisar">Pesquisar Chamados</Nav.Link>
-				  </Nav> */}
+			  {/* <Nav><Nav.Link as={Link} to="/pesquisar">Pesquisar Chamados</Nav.Link></Nav> */}
 			  <Nav>
-				{/* TODO use a good UI (alredy btn btn-primary) with Nav.Link history function */}
 				<UserBadge />
 			  </Nav>
 			</Navbar.Collapse>
 		  </Container>
 		</Navbar>
-		<Form className="container" action={this.state.issue} onSubmit={this.handleLink}>
+		<Form className="container" action={this.state.issue} onSubmit={this.handleSubmit}>
 		  <h3 id="hdrPerson">Informações</h3>
 		  <Person
-			username={this.state.username} onUsernameChange={this.handleUsernameChange}
-			name={this.state.name} onNameChange={this.handleNameChange}
-			department={this.state.department} onDepartmentChange={this.handleDepartmentChange}
-			phone={this.state.phone} onPhoneChange={this.handlePhoneChange}
-			whatsapp={this.state.whatsapp} onWhatsappChange={this.handleWhatsappChange}
+			username={this.state.username} onUsernameChange={this.handleProp}
+			name={this.state.name} onNameChange={this.handleProp}
+			department={this.state.department} onDepartmentChange={this.handleProp}
+			phone={this.state.phone} onPhoneChange={this.handleProp}
+			whatsapp={this.state.whatsapp} onWhatsappChange={this.handleProp}
 		  />
 		  <h3 id="hdrLocation">Unidade</h3>
 		  <Location
@@ -216,6 +187,9 @@ Descrição: ${this.state.description}`);
 			service={this.state.service} onServiceChange={this.handleProp}
 			description={this.state.description} onDescriptionChange={this.handleProp}
 		  />
+		  <Button type="submit" variant="success">
+			Enviar
+		  </Button>
 		</Form>
 	  </div>
 	);

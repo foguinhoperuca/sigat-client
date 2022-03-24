@@ -7,61 +7,113 @@ import Location from './Location';
 import Issue from './Issue';
 import UserBadge from './auth/UserBadge';
 import logopms from './images/logo_pms.png';
-
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import Alert from 'react-bootstrap/Alert';
 
 /* import { Link } from "react-router-dom"; */
 
 export default class App extends React.Component {
-
   constructor(props) {
 	super(props);
 
 	this.state = {
 	  issue: '',
-	  equipments: [
-		<Equipment key={0} />
-	  ],
-
 	  showEquipmentDialog: false,
+	  isLoggedIn: localStorage.getItem("token") != null,
+	  screening_id: null,
+	  ticket_number: '',
+	  created_at: '',
 
-	  username: '',
-	  name: '',
-	  department: '',
-	  phone: '',
-	  whatsapp: '',
-	  workplace: '',
-	  complementWorkplace: '',
-	  localContact: '',
-	  service: 0,
-	  description: ''
+	  /* equipments: [<Equipment key={0} /> ],
+		 username: '',
+		 name: '',
+		 department: '',
+		 phone: '',
+		 whatsapp: '',
+		 workplace: '',
+		 complementWorkplace: '',
+		 localContact: '',
+		 service: '',
+		 description: '' */
+
+	  /* FIXME just for test purpose. Remove it before send to production!! */
+	  equipments: (process.env.REACT_APP_ENVIRONMENT !== "development") ? [<Equipment key={0} /> ] : [<Equipment numRegistro={307005} key={0} />],
+	  username: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'jecampos',
+	  name: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Jefferson Luiz Oliveira de Campos',
+	  department: 'Seção de Sistemas | Divisao de Gestao de Tecnologia de Informacao | Área de Organização e Sistemas | SEPLAN',
+	  phone: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : '2707',
+	  whatsapp: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : '15-99723-3588',
+	  workplace: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Paço Municipal',
+	  complementWorkplace: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Primeiro Andar',
+	  localContact: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Xistovsky',
+	  service: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 0,
+	  description: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Teste Portal TI usando ReactJS state.'
 	};
 
+	this.handleSubmit = this.handleSubmit.bind(this);
 	this.handleLink = this.handleLink.bind(this);
 	this.handleEquipmentDelete = this.handleEquipmentDelete.bind(this);
 	this.handleEquipmentAddMultiple = this.handleEquipmentAddMultiple.bind(this);
 	this.handleEquipmentAdd = this.handleEquipmentAdd.bind(this); /* TODO Still need it!? Can I use only Add Multiple!? */
 	this.equipmentDialog = this.equipmentDialog.bind(this);
-
 	this.handleProp = this.handleProp.bind(this);
-
-	this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleSubmit(event) {
-	const form = event.currentTarget;
-	if (form.checkValidity() === false) {
-	  console.log("checkValidity failed!!");
-	  event.preventDefault();
-	  event.stopPropagation();
-	}
-	console.log("TESTING form validation");
-	console.log(form);
-	console.log(form.checkValidity());
+	/* TODO implement final validation before send data */
+	/* const form = event.currentTarget; */
+	/* if (form.checkValidity() === false) {
+	   console.log("checkValidity failed!!");
+	   event.preventDefault();
+	   event.stopPropagation();
+	   } */
+
+	let url = `/sigat-api/screenings`;
+	let equipment = "";
+	document.getElementsByName("txtEquipment").forEach((eqpmnt, index) => {
+	  equipment = equipment.concat("pms-", eqpmnt.value, " :: ");
+	});
+	equipment = equipment.replace(/ :: $/, "");
+
+	let screening = {
+	  username: this.state.username,
+	  name: this.state.name,
+	  department: this.state.department,
+	  phone: this.state.phone,
+	  whatsapp: this.state.whatsapp,
+	  workplace: this.state.workplace,
+	  complementWorkplace: this.state.complementWorkplace,
+	  localContact: this.state.localContact,
+	  equipment: equipment,
+	  service: `(${this.state.service}) - ${document.getElementById('formService').options[document.getElementById('formService').selectedIndex].text}`,
+	  description: this.state.description
+	};
+
+	fetch(url, {
+	  method: 'POST',
+	  headers: {
+		'Content-Type': 'application/json',
+		'Authorization': localStorage.getItem('token')
+	  },
+	  body: JSON.stringify(screening)
+	}).then(response => {
+	  /* TODO handle http states [400 | 401 | 500] */
+	  console.log(response);
+	  console.log("TODO get other use cases like error or login unauthorized in SAVE BACKEND!!");
+
+	  return response.json();
+	}).then(data => {
+	  this.setState({
+		screening_id: data["id"],
+		ticket_number: data["ticket_number"],
+		created_at: data["created_at"]
+	  });
+	  console.log(data);
+	});
 
 	event.preventDefault();
 	event.stopPropagation();
@@ -101,8 +153,8 @@ Descrição: ${this.state.description}`);
 	  const equips = state.equipments.filter((item, j) => first !== item);
 
 	  return {
-		  equipments: equips
-		}
+		equipments: equips
+	  }
 	});
   }
 
@@ -125,12 +177,21 @@ Descrição: ${this.state.description}`);
 	this.setState({showEquipmentDialog: show});
   }
 
-  /* TODO all handle <props> Change must be inside one function */
   handleProp(prop, value) {
 	this.setState({[prop]: value});
   }
 
   render() {
+	let action;
+
+	if (!this.state.isLoggedIn) {
+	  action = <Alert variant="danger">Efetue o login antes de enviar o chamado para triagem!</Alert>;
+	} else if (this.state.screening_id != null) {
+	  action = <Alert variant="info">Ticket enviado com sucesso para triagem! Triagem #{this.state.screening_id} - Ticket Number: {this.state.ticket_number} - Criado em: {this.state.created_at}</Alert>;
+	} else {
+	  action = <Button type="submit" variant="success">Enviar</Button>;
+	}
+
 	return (
 	  <div className="App">
 		<header className="App-header" id="main-header">
@@ -154,7 +215,7 @@ Descrição: ${this.state.description}`);
 			  {/* FIXME disabled for now... */}
 			  {/* <Nav><Nav.Link as={Link} to="/pesquisar">Pesquisar Chamados</Nav.Link></Nav> */}
 			  <Nav>
-				<UserBadge />
+				<UserBadge isLoggedIn={this.state.isLoggedIn} onIsLoggedInChange={this.handleProp} />
 			  </Nav>
 			</Navbar.Collapse>
 		  </Container>
@@ -187,9 +248,7 @@ Descrição: ${this.state.description}`);
 			service={this.state.service} onServiceChange={this.handleProp}
 			description={this.state.description} onDescriptionChange={this.handleProp}
 		  />
-		  <Button type="submit" variant="success">
-			Enviar
-		  </Button>
+		  {action}
 		</Form>
 	  </div>
 	);

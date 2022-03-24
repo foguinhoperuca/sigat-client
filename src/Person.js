@@ -42,10 +42,10 @@ export default class Person extends React.Component {
 	fetch(url)
 	  .then(response => response.json())
 	  .then(data => {
-		console.log("showing data PERSON...");
-		console.log(data);
-		console.log(data[0]);
-		console.log(data[0] === undefined);
+		/* console.log("showing data PERSON...");
+		   console.log(data);
+		   console.log(data[0]);
+		   console.log(data[0] === undefined); */
 		if (data[0] === undefined) {
 		  this.setState({
 			isValid: false,
@@ -60,7 +60,7 @@ export default class Person extends React.Component {
 		  this.props.onWhatsappChange('whatsapp', '');
 		} else {
 		  console.log("TODO implement API to get phone and whatsapp data!");
-		  const phone_valid = (data[0]["PHONE"] === undefined || data[0]["PHONE"] == "") ? false : true;
+		  const phone_valid = (data[0]["PHONE"] === undefined || data[0]["PHONE"] === "") ? false : true;
 		  console.log("phone_validation: " + phone_valid);
 		  this.setState({
 			isValid: true,
@@ -143,7 +143,7 @@ export default class Person extends React.Component {
 
   toggleEdit(input_text, button) {
 
-	if (input_text.id == 'formPhone' && input_text.checkValidity() === false) {
+	if (input_text.id === 'formPhone' && input_text.checkValidity() === false) {
 	  console.log("can't continue. Validity: " + input_text.checkValidity());
 	  this.setState({
 		isValid_phone: false,

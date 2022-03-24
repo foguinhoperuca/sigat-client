@@ -9,7 +9,6 @@ export default class UserBadge extends React.Component {
 	super(props);
 
 	this.state = {
-	  isLoggedIn: localStorage.getItem("token") != null,
 	  show: false
 	}
 
@@ -39,27 +38,24 @@ export default class UserBadge extends React.Component {
 		'Content-Type': 'application/json'
 	  },
 	  body: JSON.stringify(data)
-	})
-	  .then((response) => {
-		console.log("TODO do a better handle response with codes: [200 | 400 | 401 | 500]")
-		if (response.ok) {
-		  localStorage.setItem("token", response.headers.get("Authorization"));
-		} else {
-		  console.error(response);
-		  console.log("Login failed");
-		  throw new Error(response);
-		}
+	}).then((response) => {
+	  console.log("TODO do a better handle response with codes: [200 | 400 | 401 | 500]")
+	  if (response.ok) {
+		localStorage.setItem("token", response.headers.get("Authorization"));
+	  } else {
+		console.error(response);
+		console.log("Login failed");
+		throw new Error(response);
+	  }
 
-		return response.json();
-	  })
-	  .then(data => {
-		localStorage.setItem("user", JSON.stringify(data));
-		this.setState({
-		  show: false,
-		  isLoggedIn: true
-		});
-	  })
-	.catch((err) => console.error(err));
+	  return response.json();
+	}).then(data => {
+	  localStorage.setItem("user", JSON.stringify(data));
+	  this.props.onIsLoggedInChange('isLoggedIn', true);
+	  this.setState({
+		show: false
+	  });
+	}).catch((err) => console.error(err));
   }
 
   handleLogout(event) {
@@ -73,24 +69,20 @@ export default class UserBadge extends React.Component {
 		'Accept': 'application/json',
 		'Authorization': localStorage.getItem("token")
 	  }
-	})
-	  .then((response) => {
-		console.log("TODO do a better handle response with codes: [200 | 400 | 401 | 500]")
-		if (response.ok) {
-		  localStorage.removeItem("token");
-		  localStorage.removeItem("user");
-		  this.setState({
-			isLoggedIn: false
-		  });
-		} else {
-		  console.error(response);
-		  console.log("Logout failed");
-		  throw new Error(response);
-		}
+	}).then((response) => {
+	  console.log("TODO do a better handle response with codes: [200 | 400 | 401 | 500]")
+	  if (response.ok) {
+		localStorage.removeItem("token");
+		localStorage.removeItem("user");
+		this.props.onIsLoggedInChange('isLoggedIn', false);
+	  } else {
+		console.error(response);
+		console.log("Logout failed");
+		throw new Error(response);
+	  }
 
-		return response.text();
-	  })
-	  .then(data => console.log(data))
+	  return response.text();
+	}).then(data => console.log(data))
 	  .catch((err) => console.error(err));
   }
 
@@ -144,10 +136,11 @@ export default class UserBadge extends React.Component {
 		console.log(data);
 		console.log("TODO do something with data response");
 	  });
-	}
+  }
 
   render() {
-	const isLoggedIn = this.state.isLoggedIn;
+	const test_buttons = (process.env.REACT_APP_ENVIRONMENT === "development") ? <>&nbsp;<Button onClick={this.handleProtectedData} variant="outline-warning"><span className="bi bi-door-open"></span></Button>&nbsp;<Button onClick={this.handleUnprotectedData} variant="outline-dark"><span className="bi bi-door-closed"></span></Button></> : '';
+	const isLoggedIn = this.props.isLoggedIn;
 	let button;
 	const user = JSON.parse(localStorage.getItem("user"));
 
@@ -194,7 +187,7 @@ export default class UserBadge extends React.Component {
 
 	return (
 	  <div>
-		{button}&nbsp;<Button onClick={this.handleProtectedData} variant="outline-warning"><span className="bi bi-door-open"></span></Button>&nbsp;<Button onClick={this.handleUnprotectedData} variant="outline-dark"><span className="bi bi-door-closed"></span></Button>
+		{button}{test_buttons}
 	  </div>
 	);
   }

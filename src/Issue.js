@@ -67,7 +67,7 @@ export default class Issue extends React.Component {
 		</Form.Group>
 		<Form.Group className="mb-3" controlId="formDescription">
 		  <Form.Label>Descrição</Form.Label>
-		  <Form.Control as="textarea" rows={5} value={this.props.description} onChange={this.handleChange} required />
+		  <Form.Control as="textarea" rows={10} value={this.props.description} onChange={this.handleChange} required />
 		  <Form.Text className="text-muted">
 			Quanto mais detalhes melhor é para nossa equipe te ajudar de forma mais ágil!
 		  </Form.Text>

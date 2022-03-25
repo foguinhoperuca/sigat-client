@@ -80,7 +80,10 @@ export default class MultipleEquipmentForm extends React.Component {
 	event.preventDefault();
 
 	let eqps = document.getElementById("txtEquipmentList").value.split("\n").map((eqp, index) => {
-	  return <Equipment numRegistro={eqp} />
+	  return {
+		numRegistro: eqp,
+		onDestroyArbitraryEquipment: this.props.onHandleArbitrayEquipmentDelete
+	  };
 	});
 
 	this.props.onHandleEquipmentAddMultiple(eqps);

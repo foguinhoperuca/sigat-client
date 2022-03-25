@@ -18,6 +18,7 @@ export default class Equipment extends React.Component {
 	this.handleChange = this.handleChange.bind(this);
 	this.handleSubmit = this.handleSubmit.bind(this);
 	this.handleSearch = this.handleSearch.bind(this);
+	this.handleDestroy = this.handleDestroy.bind(this);
   }
 
   componentDidMount() {
@@ -94,6 +95,11 @@ export default class Equipment extends React.Component {
 	console.log("TODO implement validation by descrBem!!");
   }
 
+  handleDestroy(event) {
+	event.preventDefault();
+	this.props.onDestroyArbitraryEquipment(this.props.equipmentsIndex);
+  }
+
   render() {
 	return (
 	  <div>
@@ -114,7 +120,7 @@ export default class Equipment extends React.Component {
 			</Button>
 			<Button id="btnEditSearch" variant="warning" onClick={this.handleSearch} className="bi bi-pencil-square"></Button>
 			{/* TODO implement local delete */}
-			{/* <Button id="btnEditDestroy" variant="danger" onClick={this.handleDestroy} className="bi bi-trash"></Button> */}
+			<Button id="btnEditDestroy" variant="danger" onClick={this.handleDestroy} className="bi bi-trash">{this.props.equipmentsIndex}</Button>
 		  </InputGroup>
 		  {this.state.descrBem}
 		  <br />

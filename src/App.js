@@ -20,6 +20,9 @@ export default class App extends React.Component {
   constructor(props) {
 	super(props);
 
+	/* Need execute bind before initialize the state otherwise will not be possible use the state inside handleArtibraryEquipmentDelete */
+	this.handleArbitrayEquipmentDelete = this.handleArbitrayEquipmentDelete.bind(this);
+
 	this.state = {
 	  issue: '',
 	  showEquipmentDialog: false,
@@ -40,8 +43,9 @@ export default class App extends React.Component {
 		 service: '',
 		 description: '' */
 
+	  latestEquipmentKey: 1,
 	  /* FIXME just for test purpose. Remove it before send to production!! */
-	  equipments: (process.env.REACT_APP_ENVIRONMENT !== "development") ? [<Equipment key={0} /> ] : [<Equipment numRegistro={307005} key={0} />],
+	  equipments: (process.env.REACT_APP_ENVIRONMENT !== "development") ? [<Equipment key={1} equipmentsIndex={1} onDestroyArbitraryEquipment={this.handleArbitrayEquipmentDelete} /> ] : [<Equipment numRegistro={307005} key={1} equipmentsIndex={1} onDestroyArbitraryEquipment={this.handleArbitrayEquipmentDelete} />],
 	  username: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'jecampos',
 	  name: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Jefferson Luiz Oliveira de Campos',
 	  department: 'Seção de Sistemas | Divisao de Gestao de Tecnologia de Informacao | Área de Organização e Sistemas | SEPLAN',
@@ -58,9 +62,16 @@ export default class App extends React.Component {
 	this.handleLink = this.handleLink.bind(this);
 	this.handleEquipmentDelete = this.handleEquipmentDelete.bind(this);
 	this.handleEquipmentAddMultiple = this.handleEquipmentAddMultiple.bind(this);
-	this.handleEquipmentAdd = this.handleEquipmentAdd.bind(this); /* TODO Still need it!? Can I use only Add Multiple!? */
 	this.equipmentDialog = this.equipmentDialog.bind(this);
 	this.handleProp = this.handleProp.bind(this);
+  }
+
+  handleArbitrayEquipmentDelete(position) {
+	this.setState((state, props) => {
+	  return {
+		equipments: state.equipments.filter((item, j) => item.key != position)
+	  }
+	});
   }
 
   handleSubmit(event) {
@@ -147,30 +158,33 @@ Descrição: ${this.state.description}`);
 
   handleEquipmentDelete(event) {
 	event.preventDefault();
-
-	this.setState(function(state, props) {
-	  let first = state.equipments[0];
-	  const equips = state.equipments.filter((item, j) => first !== item);
-
-	  return {
-		equipments: equips
-	  }
-	});
+	this.setState({equipments: []});
   }
 
-  /* TODO Use key={} */
   handleEquipmentAddMultiple(eqps) {
 	this.setState(function(state, props) {
+	  let newerEquipments = [];
+
+	  eqps.forEach((eqp, index) => {
+		const uid = state.latestEquipmentKey + (index + 1);
+
+		newerEquipments.push(React.createElement(
+		  Equipment,
+		  {
+			...eqp,
+			...{
+			  key: uid,
+			  equipmentsIndex: uid
+			}
+		  },
+		  null));
+	  });
+
 	  return {
-		equipments: state.equipments.concat(eqps)
+		equipments: state.equipments.concat(newerEquipments),
+		latestEquipmentKey: state.latestEquipmentKey + newerEquipments.length
 	  }
 	});
-  }
-
-  handleEquipmentAdd(event) {
-	event.preventDefault();
-
-	this.handleEquipmentAddMultiple(<Equipment />);
   }
 
   equipmentDialog(show) {
@@ -237,9 +251,12 @@ Descrição: ${this.state.description}`);
 		  />
 		  <h3 id="hdrEquipments">Equipamentos</h3>
 		  <MultipleEquipmentForm
-			showEquipmentDialog={this.state.showEquipmentDialog} onCloseEquipmentDialog={this.equipmentDialog} onHandleEquipmentAddMultiple={this.handleEquipmentAddMultiple}
+			showEquipmentDialog={this.state.showEquipmentDialog}
+			onCloseEquipmentDialog={this.equipmentDialog}
+			onHandleEquipmentAddMultiple={this.handleEquipmentAddMultiple}
+			onHandleArbitrayEquipmentDelete={this.handleArbitrayEquipmentDelete}
 		  />
-		  <span className="btn btn-success btn-sm" onClick={this.handleEquipmentAdd}><span className="bi bi-plus-square"></span></span>&nbsp;<span className="btn btn-danger btn-sm" onClick={this.handleEquipmentDelete}><span className="bi bi-trash"></span></span>&nbsp;<span className="btn btn-primary btn-sm" onClick={() => this.equipmentDialog(true) }><span className="bi bi-list"></span></span>
+		  <span className="btn btn-success btn-sm" onClick={() => this.handleEquipmentAddMultiple([{onDestroyArbitraryEquipment: this.handleArbitrayEquipmentDelete}])}><span className="bi bi-plus-square"></span> 1</span>&nbsp;<span className="btn btn-danger btn-sm" onClick={this.handleEquipmentDelete}><span className="bi bi-trash"></span></span>&nbsp;<span className="btn btn-primary btn-sm" onClick={() => this.equipmentDialog(true) }><span className="bi bi-list"></span></span>
 		  <br />
 		  <br />
 		  {this.state.equipments}

@@ -39,7 +39,6 @@ export default class UserBadge extends React.Component {
 	  },
 	  body: JSON.stringify(data)
 	}).then((response) => {
-	  console.log("TODO do a better handle response with codes: [200 | 400 | 401 | 500]")
 	  if (response.ok) {
 		localStorage.setItem("token", response.headers.get("Authorization"));
 	  } else {
@@ -70,11 +69,11 @@ export default class UserBadge extends React.Component {
 		'Authorization': localStorage.getItem("token")
 	  }
 	}).then((response) => {
-	  console.log("TODO do a better handle response with codes: [200 | 400 | 401 | 500]")
 	  if (response.ok) {
 		localStorage.removeItem("token");
 		localStorage.removeItem("user");
 		this.props.onIsLoggedInChange('isLoggedIn', false);
+		this.props.onIsLoggedInChange('isLoggedInMessage', '');
 	  } else {
 		console.error(response);
 		console.log("Logout failed");
@@ -106,13 +105,34 @@ export default class UserBadge extends React.Component {
 	})
 	  .then((response) => {
 		console.log(response);
-		console.log("TODO get other use cases like error or login unauthorized");
 
-		return response.json();
+		if (response.ok) {
+		  console.log("RESPONSE OK");
+		  return response.json();
+		} else {
+		  console.log("RESPONSE nok");
+		  if (response.status == 401) {
+			console.log("Not authorized. Need login again!");
+
+			localStorage.removeItem("token");
+			localStorage.removeItem("user");
+			this.props.onIsLoggedInChange('isLoggedIn', false);
+			this.props.onIsLoggedInChange('isLoggedInMessage', 'Sessão expirada!');
+
+			return response.text();
+		  } else {
+			console.log("generic error BACKEND!!");
+			return response.json();
+		  }
+		}
 	  })
 	  .then(data => {
 		console.log(data);
-		console.log("TODO do something with data response");
+		console.log("Handling test protected route!");
+	  })
+	  .catch((err) => {
+		console.log("catch error client-side");
+		console.error(err);
 	  });
   }
 
@@ -151,6 +171,10 @@ export default class UserBadge extends React.Component {
 	  </>;
 	} else {
 	  button = <>
+		<Badge bg="warning">
+		  {this.props.isLoggedInMessage}
+		</Badge>
+		&nbsp;
 		<Button variant="primary" onClick={this.handleShow}>
           Login&nbsp; <span className="bi bi-door-open"></span>
 		</Button>

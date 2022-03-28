@@ -22,26 +22,35 @@ export default class App extends React.Component {
 
 	/* Need execute bind before initialize the state otherwise will not be possible use the state inside handleArtibraryEquipmentDelete */
 	this.handleArbitrayEquipmentDelete = this.handleArbitrayEquipmentDelete.bind(this);
+	this.handleSubmit = this.handleSubmit.bind(this);
+	this.handleLink = this.handleLink.bind(this);
+	this.handleEquipmentDelete = this.handleEquipmentDelete.bind(this);
+	this.handleEquipmentAddMultiple = this.handleEquipmentAddMultiple.bind(this);
+	this.equipmentDialog = this.equipmentDialog.bind(this);
+	this.handleProp = this.handleProp.bind(this);
 
 	this.state = {
 	  issue: '',
 	  showEquipmentDialog: false,
 	  isLoggedIn: localStorage.getItem("token") != null,
+	  isLoggedInMessage: '',
 	  screening_id: null,
 	  ticket_number: '',
 	  created_at: '',
 
-	  /* equipments: [<Equipment key={0} /> ],
-		 username: '',
-		 name: '',
-		 department: '',
-		 phone: '',
-		 whatsapp: '',
-		 workplace: '',
-		 complementWorkplace: '',
-		 localContact: '',
-		 service: '',
-		 description: '' */
+	  /*
+	  equipments: [<Equipment key={0} /> ],
+	  username: '',
+	  name: '',
+	  department: '',
+	  phone: '',
+	  whatsapp: '',
+	  workplace: '',
+	  complementWorkplace: '',
+	  localContact: '',
+	  service: '',
+	  description: ''
+	  */
 
 	  latestEquipmentKey: 1,
 	  /* FIXME just for test purpose. Remove it before send to production!! */
@@ -54,16 +63,9 @@ export default class App extends React.Component {
 	  workplace: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Paço Municipal',
 	  complementWorkplace: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Primeiro Andar',
 	  localContact: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Xistovsky',
-	  service: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 0,
+	  service: (process.env.REACT_APP_ENVIRONMENT !== "development") ? 3 : 0,
 	  description: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Teste Portal TI usando ReactJS state.'
 	};
-
-	this.handleSubmit = this.handleSubmit.bind(this);
-	this.handleLink = this.handleLink.bind(this);
-	this.handleEquipmentDelete = this.handleEquipmentDelete.bind(this);
-	this.handleEquipmentAddMultiple = this.handleEquipmentAddMultiple.bind(this);
-	this.equipmentDialog = this.equipmentDialog.bind(this);
-	this.handleProp = this.handleProp.bind(this);
   }
 
   handleArbitrayEquipmentDelete(position) {
@@ -112,11 +114,29 @@ export default class App extends React.Component {
 	  },
 	  body: JSON.stringify(screening)
 	}).then(response => {
-	  /* TODO handle http states [400 | 401 | 500] */
 	  console.log(response);
-	  console.log("TODO get other use cases like error or login unauthorized in SAVE BACKEND!!");
 
-	  return response.json();
+	  if (response.ok) {
+		console.log("Ticket created!!");
+		return response.json();
+	  } else {
+		console.log("Ticket not created!!");
+		if (response.status == 401) {
+		  console.log("Not authorized. Need login again!");
+
+		  localStorage.removeItem("token");
+		  localStorage.removeItem("user");
+		  this.setState({
+			isLoggedIn: false,
+			isLoggedInMessage: 'Sessão expirada!'
+		  });
+
+		  return response.text();
+		} else {
+		  console.log("generic error BACKEND!!");
+		  return response.json();
+		}
+	  }
 	}).then(data => {
 	  this.setState({
 		screening_id: data["id"],
@@ -229,7 +249,7 @@ Descrição: ${this.state.description}`);
 			  {/* FIXME disabled for now... */}
 			  {/* <Nav><Nav.Link as={Link} to="/pesquisar">Pesquisar Chamados</Nav.Link></Nav> */}
 			  <Nav>
-				<UserBadge isLoggedIn={this.state.isLoggedIn} onIsLoggedInChange={this.handleProp} />
+				<UserBadge isLoggedIn={this.state.isLoggedIn} isLoggedInMessage={this.state.isLoggedInMessage} onIsLoggedInChange={this.handleProp} />
 			  </Nav>
 			</Navbar.Collapse>
 		  </Container>

@@ -3,6 +3,26 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 /* import FormControl from 'react-bootstrap/FormControl'; */
 import Button from 'react-bootstrap/Button';
+import Select from 'react-select';
+
+const options = [
+  { value: '1', label: 'Paço Municipal' },
+  { value: '2', label: 'UBS Santana' },
+  { value: '3', label: 'EM Matheus Maylasky' },
+  { value: '4', label: 'CIEL Vila Santana' }
+  ,   { value: '1', label: 'Paço Municipal' },
+  { value: '2', label: 'UBS Santana' },
+  { value: '3', label: 'EM Matheus Maylasky' },
+  { value: '4', label: 'CIEL Vila Santana' }
+  ,   { value: '1', label: 'Paço Municipal' },
+  { value: '2', label: 'UBS Santana' },
+  { value: '3', label: 'EM Matheus Maylasky' },
+  { value: '4', label: 'CIEL Vila Santana' }
+  ,   { value: '1', label: 'Paço Municipal' },
+  { value: '2', label: 'UBS Santana' },
+  { value: '3', label: 'EM Matheus Maylasky' },
+  { value: '4', label: 'CIEL Vila Santana' }
+];
 
 export default class Location extends React.Component {
   constructor(props) {
@@ -118,6 +138,10 @@ export default class Location extends React.Component {
 	const btnEditWorkplace = this.state.isValid_workplace ? <Button id="btnLocation_Workplace" variant="warning" onClick={this.handleEdit} className="bi bi-pencil-square"></Button> : <Button id="btnLocation_Workplace" variant="success" onClick={this.handleEdit} className="bi bi-check2"></Button>;
 	return (
 	  <div>
+		<Form.Group className="mb-3" controlId="formLocation_Workplace">
+		  <Form.Label>Local da Solicitação</Form.Label>
+		  <Select options={options} />
+		</Form.Group>
 		<Form.Group className="mb-3" controlId="formLocation_Workplace">
 		  <Form.Label>Local da Solicitação</Form.Label>
 		  <InputGroup className="mb-3" hasValidation>

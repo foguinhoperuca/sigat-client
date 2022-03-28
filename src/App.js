@@ -13,6 +13,7 @@ import Nav from 'react-bootstrap/Nav';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
+import Spinner from 'react-bootstrap/Spinner';
 
 /* import { Link } from "react-router-dom"; */
 
@@ -37,6 +38,7 @@ export default class App extends React.Component {
 	  screening_id: null,
 	  ticket_number: '',
 	  created_at: '',
+	  isSending: '',
 
 	  /*
 	  equipments: [<Equipment key={0} /> ],
@@ -85,6 +87,8 @@ export default class App extends React.Component {
 	   event.stopPropagation();
 	   } */
 
+	this.setState({isSending: <Spinner animation="border" role="status" variant="info" size="sm"></Spinner>});
+
 	let url = `/sigat-api/screenings`;
 	let equipment = "";
 	document.getElementsByName("txtEquipment").forEach((eqpmnt, index) => {
@@ -93,6 +97,7 @@ export default class App extends React.Component {
 	equipment = equipment.replace(/ :: $/, "");
 
 	let screening = {
+	  logged_username: JSON.parse(localStorage.getItem("user")).username,
 	  username: this.state.username,
 	  name: this.state.name,
 	  department: this.state.department,
@@ -105,6 +110,7 @@ export default class App extends React.Component {
 	  service: `(${this.state.service}) - ${document.getElementById('formService').options[document.getElementById('formService').selectedIndex].text}`,
 	  description: this.state.description
 	};
+	console.log(screening);
 
 	fetch(url, {
 	  method: 'POST',
@@ -141,7 +147,8 @@ export default class App extends React.Component {
 	  this.setState({
 		screening_id: data["id"],
 		ticket_number: data["ticket_number"],
-		created_at: data["created_at"]
+		created_at: data["created_at"],
+		isSending: ''
 	  });
 	  console.log(data);
 	});
@@ -223,7 +230,7 @@ Descrição: ${this.state.description}`);
 	} else if (this.state.screening_id != null) {
 	  action = <Alert variant="info">Ticket enviado com sucesso para triagem! Triagem #{this.state.screening_id} - Ticket Number: {this.state.ticket_number} - Criado em: {this.state.created_at}</Alert>;
 	} else {
-	  action = <Button type="submit" variant="success">Enviar</Button>;
+	  action = <Button type="submit" variant="success">Enviar {this.state.isSending}</Button>;
 	}
 
 	return (

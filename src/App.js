@@ -63,7 +63,7 @@ export default class App extends React.Component {
 	  workplace: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Paço Municipal',
 	  complementWorkplace: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Primeiro Andar',
 	  localContact: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Xistovsky',
-	  service: (process.env.REACT_APP_ENVIRONMENT !== "development") ? 3 : 0,
+	  service: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 0,
 	  description: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Teste Portal TI usando ReactJS state.'
 	};
   }

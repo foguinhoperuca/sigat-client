@@ -32,12 +32,16 @@ export default class Issue extends React.Component {
   handleServiceChange(event) {
 	event.preventDefault();
 
-	const service = event.target.value;
-	this.setState((state, props) => ({
-	  comment: (Number(service) === 0) ? '' : state.services[service - 1].comments
-	}));
+	const selectedService = event.target.value;
+	this.setState((state, props) => {
+	  let comment = '';
+	  if (Number(selectedService) !== 0)
+		comment = state.services.find(service => service.id == selectedService).comments;
 
-	this.props.onServiceChange('service', service);
+	  return { comment: comment }
+	});
+
+	this.props.onServiceChange('service', selectedService);
   }
 
   handleChange(event) {
@@ -47,7 +51,7 @@ export default class Issue extends React.Component {
 
   render() {
 	const options = this.state.services.map((service) => {
-	  return <option key={service.id} value={service.id}>[{service.general_catalog.name}] {service.name}</option>
+	  return <option key={service.id} value={service.id}>{service.name}</option>
 	});
 
 	return (

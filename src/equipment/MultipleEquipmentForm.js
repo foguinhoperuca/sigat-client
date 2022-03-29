@@ -26,7 +26,7 @@ export default class MultipleEquipmentForm extends React.Component {
   }
 
   closeDialog() {
-	this.props.onCloseEquipmentDialog(false);
+	this.props.onCloseEquipmentDialog('showEquipmentDialog', false);
   }
 
   validateEquipmentRange(event) {
@@ -76,6 +76,7 @@ export default class MultipleEquipmentForm extends React.Component {
 	document.getElementById("txtEquipmentList").value = "";
   }
 
+  /* FIXME catch txtEquipmentList === '' */
   handleMultipleEquipments(event) {
 	event.preventDefault();
 
@@ -87,7 +88,7 @@ export default class MultipleEquipmentForm extends React.Component {
 	});
 
 	this.props.onHandleEquipmentAddMultiple(eqps);
-	this.props.onCloseEquipmentDialog(false);
+	this.props.onCloseEquipmentDialog('showEquipmentDialog', false);
   }
 
   render() {

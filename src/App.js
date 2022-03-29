@@ -27,7 +27,6 @@ export default class App extends React.Component {
 	this.handleLink = this.handleLink.bind(this);
 	this.handleEquipmentDelete = this.handleEquipmentDelete.bind(this);
 	this.handleEquipmentAddMultiple = this.handleEquipmentAddMultiple.bind(this);
-	this.equipmentDialog = this.equipmentDialog.bind(this);
 	this.handleProp = this.handleProp.bind(this);
 
 	this.state = {
@@ -39,22 +38,8 @@ export default class App extends React.Component {
 	  ticket_number: '',
 	  created_at: '',
 	  isSending: '',
-
-	  /*
-	  equipments: [<Equipment key={0} /> ],
-	  username: '',
-	  name: '',
-	  department: '',
-	  phone: '',
-	  whatsapp: '',
-	  workplace: '',
-	  complementWorkplace: '',
-	  localContact: '',
-	  service: '',
-	  description: ''
-	  */
-
 	  latestEquipmentKey: 1,
+
 	  /* FIXME just for test purpose. Remove it before send to production!! */
 	  equipments: (process.env.REACT_APP_ENVIRONMENT !== "development") ? [<Equipment key={1} equipmentsIndex={1} onDestroyArbitraryEquipment={this.handleArbitrayEquipmentDelete} /> ] : [<Equipment numRegistro={307005} key={1} equipmentsIndex={1} onDestroyArbitraryEquipment={this.handleArbitrayEquipmentDelete} />],
 	  username: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'jecampos',
@@ -62,7 +47,7 @@ export default class App extends React.Component {
 	  department: 'Seção de Sistemas | Divisao de Gestao de Tecnologia de Informacao | Área de Organização e Sistemas | SEPLAN',
 	  phone: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : '2707',
 	  whatsapp: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : '15-99723-3588',
-	  workplace: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Paço Municipal',
+	  workplace: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : '(0) --- UNIDADE INFORMADA NA ÚLTIMA LINHA DA SOLICITAÇÃO ---',
 	  complementWorkplace: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Primeiro Andar',
 	  localContact: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Xistovsky',
 	  service: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 0,
@@ -134,12 +119,16 @@ export default class App extends React.Component {
 		  localStorage.removeItem("user");
 		  this.setState({
 			isLoggedIn: false,
-			isLoggedInMessage: 'Sessão expirada!'
+			isLoggedInMessage: 'Sessão expirada!',
+			isSending: ''
 		  });
 
 		  return response.text();
 		} else {
 		  console.log("generic error BACKEND!!");
+		  this.setState({
+			isSending: ''
+		  });
 		  return response.json();
 		}
 	  }
@@ -214,10 +203,6 @@ Descrição: ${this.state.description}`);
 	});
   }
 
-  equipmentDialog(show) {
-	this.setState({showEquipmentDialog: show});
-  }
-
   handleProp(prop, value) {
 	this.setState({[prop]: value});
   }
@@ -272,18 +257,20 @@ Descrição: ${this.state.description}`);
 		  />
 		  <h3 id="hdrLocation">Unidade</h3>
 		  <Location
-			workplace={this.state.workplace} onWorkplaceChange={this.handleProp}
-			complementWorkplace={this.state.complementWorkplace} onComplementWorkplaceChange={this.handleProp}
-			localContact={this.state.localContact} onLocalContactChange={this.handleProp}
+			location={{value: 0, label: '--- UNIDADE INFORMADA NA ÚLTIMA LINHA DA SOLICITAÇÃO ---'}}
+			workplace={this.state.workplace}
+			complementWorkplace={this.state.complementWorkplace}
+			localContact={this.state.localContact}
+			onPropsChange={this.handleProp}
 		  />
 		  <h3 id="hdrEquipments">Equipamentos</h3>
 		  <MultipleEquipmentForm
 			showEquipmentDialog={this.state.showEquipmentDialog}
-			onCloseEquipmentDialog={this.equipmentDialog}
+			onCloseEquipmentDialog={this.handleProp}
 			onHandleEquipmentAddMultiple={this.handleEquipmentAddMultiple}
 			onHandleArbitrayEquipmentDelete={this.handleArbitrayEquipmentDelete}
 		  />
-		  <span className="btn btn-success btn-sm" onClick={() => this.handleEquipmentAddMultiple([{onDestroyArbitraryEquipment: this.handleArbitrayEquipmentDelete}])}><span className="bi bi-plus-square"></span> 1</span>&nbsp;<span className="btn btn-danger btn-sm" onClick={this.handleEquipmentDelete}><span className="bi bi-trash"></span></span>&nbsp;<span className="btn btn-primary btn-sm" onClick={() => this.equipmentDialog(true) }><span className="bi bi-list"></span></span>
+		  <span className="btn btn-success btn-sm" onClick={() => this.handleEquipmentAddMultiple([{onDestroyArbitraryEquipment: this.handleArbitrayEquipmentDelete}])}><span className="bi bi-plus-square"></span> 1</span>&nbsp;<span className="btn btn-danger btn-sm" onClick={this.handleEquipmentDelete}><span className="bi bi-trash"></span></span>&nbsp;<span className="btn btn-primary btn-sm" onClick={() => this.handleProp('showEquipmentDialog', true) }><span className="bi bi-list"></span></span>
 		  <br />
 		  <br />
 		  {this.state.equipments}

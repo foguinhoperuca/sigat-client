@@ -9,8 +9,7 @@ export default class Location extends React.Component {
 	super(props);
 
 	this.state = {
-	  locations: [],
-	  location: this.props.location
+	  locations: []
 	};
 
 	this.handleChange = this.handleChange.bind(this);
@@ -78,8 +77,8 @@ export default class Location extends React.Component {
   }
 
   handleLocationChange(selectedOption) {
-	this.setState({location: selectedOption});
 	this.props.onPropsChange('workplace', `(${selectedOption.value}) ${selectedOption.label}`);
+	this.props.onPropsChange('location', selectedOption);
   }
 
   render() {
@@ -87,7 +86,7 @@ export default class Location extends React.Component {
 	  <div>
 		<Form.Group className="mb-3" controlId="formLocation_Workplace">
 		  <Form.Label>Local da Solicitação</Form.Label>
-		  <Select value={this.state.location} onChange={this.handleLocationChange} options={this.state.locations} />
+		  <Select value={this.props.location} onChange={this.handleLocationChange} options={this.state.locations} />
 		  <Form.Text className="text-muted">Caso não encontre a sua unidade aqui, mencione-a na última linha da sua solicitação abaixo.</Form.Text>
 		</Form.Group>
 		<Form.Group className="mb-3" controlId="formLocation_ComplementWorkplace">

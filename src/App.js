@@ -28,6 +28,7 @@ export default class App extends React.Component {
 	this.handleEquipmentDelete = this.handleEquipmentDelete.bind(this);
 	this.handleEquipmentAddMultiple = this.handleEquipmentAddMultiple.bind(this);
 	this.handleProp = this.handleProp.bind(this);
+	this.handleSendAnother = this.handleSendAnother.bind(this);
 
 	this.state = {
 	  issue: '',
@@ -47,6 +48,7 @@ export default class App extends React.Component {
 	  department: 'Seção de Sistemas | Divisao de Gestao de Tecnologia de Informacao | Área de Organização e Sistemas | SEPLAN',
 	  phone: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : '2707',
 	  whatsapp: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : '15-99723-3588',
+	  location: {value: 0, label: '--- UNIDADE INFORMADA NA ÚLTIMA LINHA DA SOLICITAÇÃO ---'},
 	  workplace: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : '(0) --- UNIDADE INFORMADA NA ÚLTIMA LINHA DA SOLICITAÇÃO ---',
 	  complementWorkplace: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Primeiro Andar',
 	  localContact: (process.env.REACT_APP_ENVIRONMENT !== "development") ? '' : 'Xistovsky',
@@ -207,13 +209,41 @@ Descrição: ${this.state.description}`);
 	this.setState({[prop]: value});
   }
 
+  handleSendAnother(event) {
+	event.preventDefault();
+
+	this.setState({
+	  issue: '',
+	  screening_id: null,
+	  ticket_number: '',
+	  created_at: '',
+
+	  equipments: [],
+	  username: '',
+	  name: '',
+	  department: '',
+	  phone: '',
+	  whatsapp: '',
+	  location: {value: 0, label: '--- UNIDADE INFORMADA NA ÚLTIMA LINHA DA SOLICITAÇÃO ---'},
+	  workplace: '',
+	  complementWorkplace: '',
+	  localContact: '',
+	  service: 0,
+	  description: ''
+	});
+  }
+
   render() {
 	let action;
 
 	if (!this.state.isLoggedIn) {
 	  action = <Alert variant="danger">Efetue o login antes de enviar o chamado para triagem!</Alert>;
 	} else if (this.state.screening_id != null) {
-	  action = <Alert variant="info">Ticket enviado com sucesso para triagem! Triagem #{this.state.screening_id} - Ticket Number: {this.state.ticket_number} - Criado em: {this.state.created_at}</Alert>;
+	  action =<>
+		<Alert variant="info">Ticket enviado com sucesso para triagem! Triagem #{this.state.screening_id} - Ticket Number: {this.state.ticket_number} - Criado em: {this.state.created_at}</Alert>
+		<Button variant="warning" onClick={this.handleSendAnother}>Enviar outro!</Button>
+	  </>
+	  ;
 	} else {
 	  action = <Button type="submit" variant="success">Enviar {this.state.isSending}</Button>;
 	}
@@ -257,7 +287,7 @@ Descrição: ${this.state.description}`);
 		  />
 		  <h3 id="hdrLocation">Unidade</h3>
 		  <Location
-			location={{value: 0, label: '--- UNIDADE INFORMADA NA ÚLTIMA LINHA DA SOLICITAÇÃO ---'}}
+			location={this.state.location}
 			workplace={this.state.workplace}
 			complementWorkplace={this.state.complementWorkplace}
 			localContact={this.state.localContact}

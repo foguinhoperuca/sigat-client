@@ -4,6 +4,9 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
 
+import API from './Api';
+
+/* TODO set token as property of user */
 export default class UserBadge extends React.Component {
   constructor(props) {
 	super(props);
@@ -19,6 +22,8 @@ export default class UserBadge extends React.Component {
 
 	this.handleProtectedData = this.handleProtectedData.bind(this);
 	this.handleUnprotectedData = this.handleUnprotectedData.bind(this);
+	this.handleAPIUnprotected = this.handleAPIUnprotected.bind(this);
+	this.handleAPIProtected = this.handleAPIProtected.bind(this);
   }
 
   handleLogin(event) {
@@ -158,13 +163,38 @@ export default class UserBadge extends React.Component {
 	  });
   }
 
+  handleAPIUnprotected(event) {
+	API.get('/sigat-api/sim/search_sim_asset')
+	   .then((response) => {
+		 console.log('Axios handle success response - UNprotected DATA');
+		 console.log(response);
+		 console.log(response.data);
+	   })
+	   .catch(function (error) {
+		 console.error(error);
+	   });
+  }
+
+  handleAPIProtected(event) {
+	API.get('/sigat-api/sim/show_sim_asset/307005')
+	   .then((response) => {
+		 console.log('Axios handle success response - PROTECTED DATA');
+		 console.log(response);
+		 console.log(response.data);
+	   })
+	   .catch(function (error) {
+		 console.error(error);
+	   });
+
+  }
+
   render() {
-	const test_buttons = (process.env.REACT_APP_ENVIRONMENT === "development") ? <>&nbsp;<Button onClick={this.handleProtectedData} variant="outline-warning"><span className="bi bi-door-open"></span></Button>&nbsp;<Button onClick={this.handleUnprotectedData} variant="outline-dark"><span className="bi bi-door-closed"></span></Button></> : '';
+	const test_buttons = (process.env.REACT_APP_ENVIRONMENT === "development") ? <>&nbsp;<Button onClick={this.handleProtectedData} variant="outline-warning"><span className="bi bi-door-open"></span></Button>&nbsp;<Button onClick={this.handleUnprotectedData} variant="outline-dark"><span className="bi bi-door-closed"></span></Button>&nbsp;<Button onClick={this.handleAPIUnprotected} variant="outline-info"><span className="bi bi-bezier"></span></Button>&nbsp;<Button onClick={this.handleAPIProtected} variant="primary"><span className="bi bi-bezier"></span></Button></> : '';
 	const isLoggedIn = this.props.isLoggedIn;
 	let button;
 	const user = JSON.parse(localStorage.getItem("user"));
 
-	/* TODO use a good UI (alredy btn btn-primary) with Nav.Link history function */
+	/* TODO use a good UI (already btn btn-primary) with Nav.Link history function */
 	if (isLoggedIn) {
 	  button = <>
 		Olá <Badge bg="info">{user.username}</Badge>!&nbsp;<a className="btn btn-danger" href="/logout" onClick={this.handleLogout}>Logout <span className="bi bi-door-closed"></span></a>

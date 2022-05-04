@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Badge from 'react-bootstrap/Badge';
 
-import API from './Api';
+import ApiPlayground from './ApiPlayground';
 
 /* TODO set token as property of user */
 export default class UserBadge extends React.Component {
@@ -19,11 +19,6 @@ export default class UserBadge extends React.Component {
 	this.handleLogout = this.handleLogout.bind(this);
 	this.handleShow = this.handleShow.bind(this);
 	this.handleClose = this.handleClose.bind(this);
-
-	this.handleProtectedData = this.handleProtectedData.bind(this);
-	this.handleUnprotectedData = this.handleUnprotectedData.bind(this);
-	this.handleAPIUnprotected = this.handleAPIUnprotected.bind(this);
-	this.handleAPIProtected = this.handleAPIProtected.bind(this);
   }
 
   handleLogin(event) {
@@ -98,98 +93,8 @@ export default class UserBadge extends React.Component {
 	this.setState({show: false});
   }
 
-  handleProtectedData(event) {
-	event.preventDefault();
-	let url = "/sigat-api/sim/show_sim_asset/307005";
-	fetch(url, {
-	  method: 'GET',
-	  headers: {
-		'Content-Type': 'application/json',
-		'Authorization': localStorage.getItem('token')
-	  }
-	})
-	  .then((response) => {
-		console.log(response);
-
-		if (response.ok) {
-		  console.log("RESPONSE OK");
-		  return response.json();
-		} else {
-		  console.log("RESPONSE nok");
-		  if (response.status == 401) {
-			console.log("Not authorized. Need login again!");
-
-			localStorage.removeItem("token");
-			localStorage.removeItem("user");
-			this.props.onIsLoggedInChange('isLoggedIn', false);
-			this.props.onIsLoggedInChange('isLoggedInMessage', 'Sessão expirada!');
-
-			return response.text();
-		  } else {
-			console.log("generic error BACKEND!!");
-			return response.json();
-		  }
-		}
-	  })
-	  .then(data => {
-		console.log(data);
-		console.log("Handling test protected route!");
-	  })
-	  .catch((err) => {
-		console.log("catch error client-side");
-		console.error(err);
-	  });
-  }
-
-  handleUnprotectedData(event) {
-	event.preventDefault();
-	let url = "/sigat-api/sim/search_sim_asset";
-	fetch(url, {
-	  method: 'GET',
-	  headers: {
-		'Content-Type': 'application/json',
-		'Authorization': localStorage.getItem('token')
-	  }
-	})
-	  .then((response) => {
-		console.log(response);
-		console.log("TODO get other use cases like error or login unauthorized");
-
-		return response.json();
-	  })
-	  .then(data => {
-		console.log(data);
-		console.log("TODO do something with data response");
-	  });
-  }
-
-  handleAPIUnprotected(event) {
-	API.get('/sigat-api/sim/search_sim_asset')
-	   .then((response) => {
-		 console.log('Axios handle success response - UNprotected DATA');
-		 console.log(response);
-		 console.log(response.data);
-	   })
-	   .catch(function (error) {
-		 console.error(error);
-	   });
-  }
-
-  handleAPIProtected(event) {
-	API.get('/sigat-api/sim/show_sim_asset/307005')
-	   .then((response) => {
-		 console.log('Axios handle success response - PROTECTED DATA');
-		 console.log(response);
-		 console.log(response.data);
-	   })
-	   .catch(function (error) {
-		 console.error(error);
-	   });
-
-  }
-
   render() {
-	const test_buttons = (process.env.REACT_APP_ENVIRONMENT === "development") ? <>&nbsp;<Button onClick={this.handleProtectedData} variant="outline-warning"><span className="bi bi-door-open"></span></Button>&nbsp;<Button onClick={this.handleUnprotectedData} variant="outline-dark"><span className="bi bi-door-closed"></span></Button>&nbsp;<Button onClick={this.handleAPIUnprotected} variant="outline-info"><span className="bi bi-bezier"></span></Button>&nbsp;<Button onClick={this.handleAPIProtected} variant="primary"><span className="bi bi-bezier"></span></Button></> : '';
+	const test_buttons = (process.env.REACT_APP_ENVIRONMENT === "development") ? <ApiPlayground onUserStatusChange={this.props.onIsLoggedInChange} /> : '';
 	const isLoggedIn = this.props.isLoggedIn;
 	let button;
 	const user = JSON.parse(localStorage.getItem("user"));

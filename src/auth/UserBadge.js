@@ -102,7 +102,7 @@ export default class UserBadge extends React.Component {
 	/* TODO use a good UI (already btn btn-primary) with Nav.Link history function */
 	if (isLoggedIn) {
 	  button = <>
-		Olá <Badge bg="info">{user.username}</Badge>!&nbsp;<a className="btn btn-danger" href="/logout" onClick={this.handleLogout}>Logout <span className="bi bi-door-closed"></span></a>
+		Olá <Badge bg="info">{user.username}</Badge>!&nbsp;<a className="btn btn-danger btn-sm" href="/logout" onClick={this.handleLogout}><span className="bi bi-door-closed"></span></a>
 	  </>;
 	} else {
 	  button = <>

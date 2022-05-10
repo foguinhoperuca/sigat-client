@@ -1,7 +1,4 @@
 import React from 'react';
-
-import Equipment from './Equipment';
-
 import Modal from 'react-bootstrap/Modal';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';

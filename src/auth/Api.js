@@ -28,7 +28,7 @@ api.interceptors.response.use(
  	return response;
   },
   function(error) {
-	if (error.response !== undefined && error.response.status == 401) {
+	if (error.response !== undefined && error.response.status === 401) {
 	  console.log("Not authorized. Need login again!");
 	  localStorage.removeItem("token");
 	  localStorage.removeItem("user");

@@ -5,7 +5,10 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import FormControl from 'react-bootstrap/FormControl';
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 import logopms from '../images/logo_pms.png';
 
 import DataTable from 'react-data-table-component';
@@ -19,27 +22,22 @@ const columns = [
     sortable: true,
   },
   {
-    name: 'Solicitante',
-    selector: row => row.CustomerID,
-    sortable: false,
-  },
-  {
     name: 'Local',
     selector: row => row.Local,
     sortable: false,
   },
   {
-    name: 'Data Abertura',
+    name: 'Abertura',
     selector: row => row.Created,
     sortable: true,
   },
   {
-    name: 'Responsável',
-    selector: row => row.Responsible,
+    name: 'Agente',
+    selector: row => row.Owner,
     sortable: false,
   },
   {
-    name: 'Status',
+    name: 'Estado',
     selector: row => row.State,
     sortable: true,
   },
@@ -50,7 +48,9 @@ const columns = [
   }
 ];
 
-const ExpandedComponent = ({data}) => <pre>{data.Title}</pre>;
+const ExpandedComponent = ({data}) => {
+
+};
 
 /* TODO to smooth out the rough edges:
  * - Verify if user is logged in (client-side)
@@ -66,44 +66,200 @@ export default class Painel extends React.Component {
 	  isLoggedIn: localStorage.getItem("token") != null,
 	  isLoggedInMessage: '',
 	  loadingData: true,
-	  data: []
+	  data: [],
+	  histories: []
 	};
 
 	this.handleProp = this.handleProp.bind(this);
 	this.handleChange = this.handleChange.bind(this);
 
 	this.getTicketDetail = this.getTicketDetail.bind(this);
+	this.getTicketHistory = this.getTicketHistory.bind(this);
+
+	this.inspectState = this.inspectState.bind(this);
+	this.expandedComponent = this.expandedComponent.bind(this);
+  }
+
+  inspectState() {
+	console.clear();
+	console.log("--- data ---");
+	console.log(this.state.data);
+	console.log("--- history ---");
+	console.log(this.state.histories);
+  }
+
+  expandedComponent({data}) {
+	let histories = this.state.histories.filter((item) => {
+	  return item.TicketID == data.id
+	})[0];
+
+	console.log('---------------');
+	console.log(data);
+	console.log(histories);
+	console.log('---------------');
+
+	
+	let hist = [];
+	/* histories.forEach({(element) =>
+	   hist.push();
+	   }); */
+	
+	return <>
+	  <Tabs defaultActiveKey="info" id="uncontrolled-tab-example" className="mb-3">
+		<Tab eventKey="screening" title="Triagem">
+		  <pre>Triagem saved</pre>
+		</Tab>
+		<Tab eventKey="info" title="Informações">
+		  <Tab.Container id="left-tabs-example" defaultActiveKey="first">
+			<Row>
+			  <Col sm={3}>
+				<Nav variant="pills" className="flex-column">
+				  <Nav.Item>
+					<Nav.Link eventKey="first">Geral</Nav.Link>
+				  </Nav.Item>
+				  <Nav.Item>
+					<Nav.Link eventKey="second">Detalhes</Nav.Link>
+				  </Nav.Item>
+				</Nav>
+			  </Col>
+			  <Col sm={9}>
+				<Tab.Content>
+				  <Tab.Pane eventKey="first">
+					<h4>{data.Title}</h4>
+					{/* <Row>
+						<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
+						<Form.Label column sm="2">Título</Form.Label>
+						<Col sm="10"><Form.Control readOnly defaultValue={data.Title} /></Col>
+						</Form.Group>
+						</Row> */}
+					<Row>
+					  <Col sm="3">
+						<Form.Group className="mb-3" controlId="formPlaintextEmail">
+						  <Form.Label column sm="2">Estado</Form.Label>
+						  <Form.Control readOnly defaultValue={data.State} />
+						</Form.Group>
+					  </Col>
+					  <Col sm="3">
+						<Form.Group className="mb-3" controlId="formPlaintextEmail">
+						  <Form.Label column sm="2">Fila</Form.Label>
+						  <Form.Control readOnly defaultValue={data.Queue} />
+						</Form.Group>
+					  </Col>
+					  <Col sm="3">
+						<Form.Group className="mb-3" controlId="formPlaintextEmail">
+						  <Form.Label column sm="2">Abertura</Form.Label>
+						  <Form.Control readOnly defaultValue={data.Created} />
+						</Form.Group>
+					  </Col>
+					  <Col sm="3">
+						<Form.Group className="mb-3" controlId="formPlaintextEmail">
+						  <Form.Label column sm="2">Proprietário</Form.Label>
+						  <Form.Control readOnly defaultValue={data.Owner} />
+						</Form.Group>
+					  </Col>
+					</Row>
+					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
+					  <Form.Label column sm="2">Solicitante</Form.Label>
+					  <Col sm="10"><Form.Control readOnly defaultValue={data.CustomerID} /></Col>
+					</Form.Group>
+				  </Tab.Pane>
+				  <Tab.Pane eventKey="second">
+					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
+					  <Form.Label column sm="2">TicketID</Form.Label>
+					  <Col sm="10"><Form.Control readOnly defaultValue={data.TicketID} /></Col>
+					</Form.Group>
+					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
+					  <Form.Label column sm="2">Número do Ticket</Form.Label>
+					  <Col sm="10"><Form.Control readOnly defaultValue={data.TicketNumber} /></Col>
+					</Form.Group>
+
+
+					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
+					  <Form.Label column sm="2">Prioridade</Form.Label>
+					  <Col sm="10"><Form.Control readOnly defaultValue={data.Priority} /></Col>
+					</Form.Group>
+
+					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
+					  <Form.Label column sm="2">Responsável</Form.Label>
+					  <Col sm="10"><Form.Control readOnly defaultValue={data.Responsible} /></Col>
+					</Form.Group>
+					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
+					  <Form.Label column sm="2">Última Alteração</Form.Label>
+					  <Col sm="10"><Form.Control readOnly defaultValue={data.Changed} /></Col>
+					</Form.Group>
+
+
+					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
+					  <Form.Label column sm="2">Usuário Solicitante</Form.Label>
+					  <Col sm="10"><Form.Control readOnly defaultValue={data.CustomerUserID} /></Col>
+					</Form.Group>
+
+					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
+					  <Form.Label column sm="2">Trancado?</Form.Label>
+					  <Col sm="10"><Form.Control readOnly defaultValue={data.Lock} /></Col>
+					</Form.Group>
+					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
+					  <Form.Label column sm="2">Tipo</Form.Label>
+					  <Col sm="10"><Form.Control readOnly defaultValue={data.Type} /></Col>
+					</Form.Group>
+				  </Tab.Pane>
+				</Tab.Content>
+			  </Col>
+			</Row>
+		  </Tab.Container>
+		</Tab>
+		<Tab eventKey="customerService" title="Atendimento">
+		  <pre>TODO show ticket history</pre>
+		  <br />
+		  Hist Ticket ID: {histories.TicketID}
+		  <br />
+		  {hist}
+		</Tab>
+		<Tab eventKey="equipment" title="Equipamentos">
+		  <pre>Todo show all CIs</pre>
+		</Tab>
+		<Tab eventKey="description" title="Descrição Completa" >
+		  <pre>TODO show all articles</pre>
+		</Tab>
+	  </Tabs>
+	</>
   }
 
   componentDidMount() {
-	console.clear();
+	/* console.clear(); */
 
 	const user = JSON.parse(localStorage.getItem("user"));
 	API.get(`/gestaoti/otrs/list_ticket_by_customer?customer=${user.username}`)
 	   .then((response) => {
 		 console.debug(response.data);
 
-		 let tickets = response.data.TicketID.map((tid, index) => {
-		   return {
+		 let tickets = [];
+		 let histories = [];
+		 response.data.TicketID.forEach((tid) => {
+		   tickets.push({
 			 id: tid,
 			 action: <Button variant="outline-primary" onClick={() => this.getTicketDetail(tid) }><span className="bi bi-bezier"></span></Button>,
 			 TicketNumber: `Ticket ID ${tid}`,
-			 CustomerID: `Carregando dados`,
 			 Local: `Carregando dados`,
 			 Created: `Carregando dados`,
-			 Responsible: `Carregando dados`,
-			 State: `Carregando dados`,
-			 Title: `TicketID: ${tid} :: `
-		   };		   
-		 });
-		 
-		 this.setState({
-		   loadingData: false,
-		   data: tickets
+			 Owner: `Carregando dados`,
+			 State: `Carregando dados`
+		   });
+
+		   histories.push({
+			 TicketID: tid,
+			 History: null
+		   });
 		 });
 
-		 response.data.TicketID.map((tid, index) => {
-		   this.getTicketDetail(tid);		   
+		 this.setState({ loadingData: false, data: tickets, histories: histories }, () => {
+		   response.data.TicketID.forEach((tid) => {
+			 this.getTicketDetail(tid);
+
+			 this.getTicketHistory(tid);
+			 /* console.log(`TODO call CI for ${tid}`);
+				console.log(`TODO call SCREENING for ${tid}`); */
+		   });
 		 });
 	   })
 	   .catch((error) => {
@@ -113,32 +269,44 @@ export default class Painel extends React.Component {
 	;
   }
 
+  // FIXME when loading, fields with "loading" placeholder isn't updating - occurs only when tab is open before dynamic loading
   getTicketDetail(ticketId) {
 	API.get(`/gestaoti/otrs/get_ticket?ticket_id=${ticketId}`)
 	   .then((response) => {
-		 console.log(`getTicketDetail for ${ticketId}`);
-		 /* console.log(response.data.Ticket[0]); */
+		 console.debug(response.data.Ticket[0]);
 
 		 let ticket = {
 		   id: ticketId,
-		   action: <Button variant="outline-info" onClick={() => this.getTicketDetail(ticketId) }><span className="bi bi-bezier"></span></Button>,
-		   TicketNumber: response.data.Ticket[0].TicketNumber,
-		   CustomerID: response.data.Ticket[0].CustomerID,
-		   Local: 'TODO implement it!',
-		   Created: response.data.Ticket[0].Created,
-		   Responsible: response.data.Ticket[0].Responsible,
-		   State: response.data.Ticket[0].State,
-		   Title: `TicketID ${ticketId} -- ${response.data.Ticket[0].Title}`
+		   action: <Button variant="outline-info" onClick={() => this.getTicketDetail(ticketId) }><span className="bi bi-bezier"></span></Button>
 		 };
+		 ticket = {...response.data.Ticket[0], ...ticket};
 
 		 this.setState((state, props) => {
 		   return {
-			   data: state.data.map((item) => (item.id == ticketId) ? ticket : item)
+			 data: state.data.map((item) => (item.id == ticketId) ? ticket : item)
 		   }
 		 });
 	   })
 	   .catch((error) => {
 		 console.log(`Error getting single Ticket: ID ${ticketId} `);
+	   })
+	;
+  }
+
+  getTicketHistory(ticketId) {
+	API.get(`/sigat-api/otrs/tickets/history?ticket_id=${ticketId}`)
+	   .then((response) => {
+		 console.debug(response.data);
+
+		 this.setState((state, props) => {
+		   return {
+			 histories: state.histories.map((item) => (item.TicketID == ticketId) ? {...item, ...response.data.TicketHistory[0]} : item)
+		   }
+		 });
+	   })
+	   .catch((error) => {
+		 console.log(`Error getting Ticket History: ID ${ticketId} `);
+		 console.log(error);
 	   })
 	;
   }
@@ -168,25 +336,9 @@ export default class Painel extends React.Component {
 			<Navbar.Toggle aria-controls="basic-navbar-nav" />
 			<Navbar.Collapse id="basic-navbar-nav">
 			  <Nav className="me-auto">
-				{/* <Nav.Link href="#generic-data-ticket">Informações Gerais</Nav.Link> */}
-				{/* <Nav.Link href="#detail-data-ticket">Detalhes</Nav.Link> */}
 				<Nav.Link as={Link} to="/">Abrir Chamado</Nav.Link>
+				<Button variant="outline-success" onClick={this.inspectState}>Inspecionar State</Button>
 			  </Nav>
-			  {/* <Form className="d-flex" onSubmit={this.handleSearch}>
-				  <Navbar.Text className="me-3">Ticket</Navbar.Text>
-				  <FormControl
-				  type="search"
-				  placeholder="ex: 2022021402000014"
-				  className="me-1"
-				  aria-label="Search"
-				  value={this.state.TicketNumber}
-				  onChange={this.handleChange}
-				  />
-				  <Button variant="outline-success" onClick={this.handleSearch}>Pesquisar</Button>
-				  </Form> */}
-			  {/* <Nav>
-				  <Nav.Link as={Link} to="/">Abrir Chamado</Nav.Link>
-				  </Nav> */}
 			  <Nav>
 				<UserBadge isLoggedIn={this.state.isLoggedIn} isLoggedInMessage={this.state.isLoggedInMessage} onIsLoggedInChange={this.handleProp} />
 			  </Nav>
@@ -194,21 +346,14 @@ export default class Painel extends React.Component {
 		  </Container>
 		</Navbar>
 		<div className="container" >
-	      {/* <Ticket key={this.state.TicketID} TicketID={this.state.TicketID} searchResult={this.state.searchResult} /> */}
-
-
-
-
-		  <br />
 		  <DataTable
-			columns={columns}
-			data={this.state.data}
-			expandableRows
-			expandableRowsComponent={ExpandedComponent}
-			pagination
+		  columns={columns}
+		  data={this.state.data}
+		  expandableRows
+			expandableRowsComponent={this.expandedComponent}
+		  pagination
 			progressPending={this.state.loadingData}
 		  />
-
 		</div>
 	  </div>
 	);

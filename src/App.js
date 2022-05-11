@@ -15,6 +15,8 @@ import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 import Spinner from 'react-bootstrap/Spinner';
 
+import KonamiCode from 'konami-code-js';
+
 /* import { Link } from "react-router-dom"; */
 
 export default class App extends React.Component {
@@ -234,6 +236,16 @@ Descrição: ${this.state.description}`);
   }
 
   render() {
+	let kc = new KonamiCode({
+      listener: document.getElementById("hdrPerson")
+	});
+	kc.setCallback(function () {
+      /* kc.disable(); */
+	  console.log("Konami Code exec!");
+	  alert("Você destravou uma feature de testes: PAINEL de chamados! XD");
+	  window.location.assign('/painel');
+	});
+
 	let action;
 
 	if (!this.state.isLoggedIn) {

@@ -89,26 +89,85 @@ export default class Painel extends React.Component {
   }
 
   expandedComponent({data}) {
-	let histories = this.state.histories.filter((item) => {
-	  return item.TicketID == data.id
-	})[0];
-
-	console.log('---------------');
-	console.log(data);
-	console.log(histories);
-	console.log('---------------');
-
-	
-	let hist = [];
-	/* histories.forEach({(element) =>
-	   hist.push();
+	/* FIXME this code is exploding sometimes: filter is not working - some times data can't get by and undefined.map occurs... */
+	const hist = this.state.histories.filter((item) => item.TicketID == data.id)[0].History.map((history, index) => {
+	  return <div key={index}>
+		<Row>
+		  <Col sm="6">
+			<Form.Group className="mb-3" controlId="historyCreateTime">
+			  <Form.Label column sm="2">Data Alteração</Form.Label>
+			  <Form.Control readOnly defaultValue={history.CreateTime} />
+			</Form.Group>
+		  </Col>
+		  <Col sm="6">
+			<Form.Group className="mb-3" controlId="historyHistoryType">
+			  <Form.Label column sm="2">Tipo Alteração</Form.Label>
+			  <Form.Control readOnly defaultValue={history.HistoryType} />
+			</Form.Group>
+		  </Col>
+		</Row>
+		<hr />
+	  </div>;
+	});
+	/* TODO group by creation time as is done in OTRS - Filtrar as datas; pelas datas, filtrar os registros e montar uma exibição dessa filtragem */
+	/* let groupedByCreationTime;
+	   createTimes = this.state.histories.filter((item) => item.TicketID == data.id)[0].History.filter((v, i, a) => a.indexOf(v) === i);
+	   createTimes.forEach((createTime) => {
+	   filtered =
+	   groupedByCreationTime += <>
+	   </>;
 	   }); */
-	
+
+
+	let navArticles = "";
+	let articles = <pre>Nenhum artigo para exibir!!</pre>;
+	let firstArticle = "";
+	if (data.Article !== undefined) {
+	  navArticles = data.Article.map((article, index) => {
+		if (index == 0)
+		  firstArticle = `articleId_${article.ArticleID}`;
+
+		return <Nav.Item key={index}><Nav.Link eventKey={`articleId_${article.ArticleID}`}>#{article.ArticleID} de {article.CreateTime}</Nav.Link></Nav.Item>;
+	  });
+	  articles = data.Article.map((article, index) => {
+		return <Tab.Pane eventKey={`articleId_${article.ArticleID}`} key={index}>
+		  <Row>
+			<Col sm="6">
+			  <Form.Group className="mb-3" controlId="articleChangeTime">
+				<Form.Label column sm="4">Última Alteração</Form.Label>
+				<Form.Control readOnly defaultValue={article.ChangeTime} />
+			  </Form.Group>
+			</Col>
+			<Col sm="6">
+			  <Form.Group className="mb-3" controlId="articleTo">
+				<Form.Label column sm="4">Remetente</Form.Label>
+				<Form.Control readOnly defaultValue={article.From} />
+			  </Form.Group>
+			</Col>
+		  </Row>
+		  <Form.Group as={Row} className="mb-3" controlId="articleSubject">
+			<Form.Label column sm="2">Assunto</Form.Label>
+			<Col sm="10"><Form.Control readOnly defaultValue={article.Subject} /></Col>
+		  </Form.Group>
+		  <Form.Group as={Row} className="mb-3" controlId="articleBody">
+			<Form.Label column sm="2">Descrição</Form.Label>
+			<Col sm="10"><Form.Control as="textarea" rows={15} value={article.Body} readOnly /></Col>
+		  </Form.Group>
+	  </Tab.Pane>
+	  });
+	}
+
+	if (data.TicketNumber == '2022032802000041') {
+	  console.debug('---------------');
+	  console.debug(data);
+	  console.debug(hist);
+	  console.debug(articles);
+	  console.debug("TODO get all CI");
+	  console.debug('---------------');
+	}
+
 	return <>
 	  <Tabs defaultActiveKey="info" id="uncontrolled-tab-example" className="mb-3">
-		<Tab eventKey="screening" title="Triagem">
-		  <pre>Triagem saved</pre>
-		</Tab>
 		<Tab eventKey="info" title="Informações">
 		  <Tab.Container id="left-tabs-example" defaultActiveKey="first">
 			<Row>
@@ -209,17 +268,26 @@ export default class Painel extends React.Component {
 		  </Tab.Container>
 		</Tab>
 		<Tab eventKey="customerService" title="Atendimento">
-		  <pre>TODO show ticket history</pre>
-		  <br />
-		  Hist Ticket ID: {histories.TicketID}
-		  <br />
 		  {hist}
 		</Tab>
 		<Tab eventKey="equipment" title="Equipamentos">
 		  <pre>Todo show all CIs</pre>
 		</Tab>
 		<Tab eventKey="description" title="Descrição Completa" >
-		  <pre>TODO show all articles</pre>
+		  <Tab.Container id="articles" defaultActiveKey={firstArticle}>
+			<Row>
+			  <Col sm={3}>
+				<Nav variant="pills" className="flex-column">
+				  {navArticles}
+				</Nav>
+			  </Col>
+			  <Col sm={9}>
+				<Tab.Content>
+				  {articles}
+				</Tab.Content>
+			  </Col>
+			</Row>
+		  </Tab.Container>
 		</Tab>
 	  </Tabs>
 	</>
@@ -271,7 +339,7 @@ export default class Painel extends React.Component {
 
   // FIXME when loading, fields with "loading" placeholder isn't updating - occurs only when tab is open before dynamic loading
   getTicketDetail(ticketId) {
-	API.get(`/gestaoti/otrs/get_ticket?ticket_id=${ticketId}`)
+	API.get(`/sigat-api/otrs/tickets/show?ticket_id=${ticketId}&all_articles=true`)
 	   .then((response) => {
 		 console.debug(response.data.Ticket[0]);
 
@@ -300,6 +368,7 @@ export default class Painel extends React.Component {
 
 		 this.setState((state, props) => {
 		   return {
+			 /* FIXME catch backend's exception - cannot read properties of undefined (reading '0') --> HTTP 500 is returned and then explodes here!! */
 			 histories: state.histories.map((item) => (item.TicketID == ticketId) ? {...item, ...response.data.TicketHistory[0]} : item)
 		   }
 		 });

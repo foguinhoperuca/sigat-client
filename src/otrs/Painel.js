@@ -7,8 +7,10 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
+import Badge from 'react-bootstrap/Badge';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Table from 'react-bootstrap/Table';
 import logopms from '../images/logo_pms.png';
 
 import DataTable from 'react-data-table-component';
@@ -20,11 +22,6 @@ const columns = [
     name: 'Ticket',
     selector: row => row.TicketNumber,
     sortable: true,
-  },
-  {
-    name: 'Local',
-    selector: row => row.Local,
-    sortable: false,
   },
   {
     name: 'Abertura',
@@ -67,7 +64,8 @@ export default class Painel extends React.Component {
 	  isLoggedInMessage: '',
 	  loadingData: true,
 	  data: [],
-	  histories: []
+	  histories: [],
+	  locations: []
 	};
 
 	this.handleProp = this.handleProp.bind(this);
@@ -75,6 +73,7 @@ export default class Painel extends React.Component {
 
 	this.getTicketDetail = this.getTicketDetail.bind(this);
 	this.getTicketHistory = this.getTicketHistory.bind(this);
+	this.getLocations = this.getLocations.bind(this);
 
 	this.inspectState = this.inspectState.bind(this);
 	this.expandedComponent = this.expandedComponent.bind(this);
@@ -86,28 +85,82 @@ export default class Painel extends React.Component {
 	console.log(this.state.data);
 	console.log("--- history ---");
 	console.log(this.state.histories);
+	console.log("--- location ---");
+	console.log(this.state.locations);
+  }
+
+  componentDidMount() {
+	const user = JSON.parse(localStorage.getItem("user"));
+	API.get(`/gestaoti/otrs/list_ticket_by_customer?customer=${user.username}`)
+	   .then((response) => {
+		 console.debug(response.data);
+
+		 let tickets = [];
+		 let histories = [];
+		 let locations = [];
+		 response.data.TicketID.forEach((tid) => {
+		   tickets.push({
+			 id: tid,
+			 action: <Button variant="outline-primary" onClick={() => this.getTicketDetail(tid) }><span className="bi bi-bezier"></span></Button>,
+			 TicketNumber: `Ticket ID ${tid}`,
+			 Created: `Carregando dados`,
+			 Owner: `Carregando dados`,
+			 State: `Carregando dados`
+		   });
+
+		   histories.push({
+			 TicketID: tid,
+			 History: null
+		   });
+
+		   locations.push({
+			 TicketID: tid,
+			 Locations: null
+		   });
+		 });
+
+		 this.setState({ loadingData: false, data: tickets, histories: histories, locations: locations }, () => {
+		   response.data.TicketID.forEach((tid) => {
+			 this.getTicketDetail(tid);
+
+			 this.getTicketHistory(tid);
+
+			 /* TODO implement search location's id backend */
+			 this.getLocations(tid);
+		   });
+		 });
+	   })
+	   .catch((error) => {
+		 console.log("Error with getting customer tickets");
+		 console.error(error);
+	   })
+	;
   }
 
   expandedComponent({data}) {
 	/* FIXME this code is exploding sometimes: filter is not working - some times data can't get by and undefined.map occurs... */
 	const hist = this.state.histories.filter((item) => item.TicketID == data.id)[0].History.map((history, index) => {
-	  return <div key={index}>
-		<Row>
-		  <Col sm="6">
-			<Form.Group className="mb-3" controlId="historyCreateTime">
-			  <Form.Label column sm="2">Data Alteração</Form.Label>
-			  <Form.Control readOnly defaultValue={history.CreateTime} />
-			</Form.Group>
-		  </Col>
-		  <Col sm="6">
-			<Form.Group className="mb-3" controlId="historyHistoryType">
-			  <Form.Label column sm="2">Tipo Alteração</Form.Label>
-			  <Form.Control readOnly defaultValue={history.HistoryType} />
-			</Form.Group>
-		  </Col>
-		</Row>
-		<hr />
-	  </div>;
+	  return <tr key={index}>
+		<td>{history.CreateTime}</td>
+		<td><Badge bg="info">{history.HistoryType}</Badge></td>
+	  </tr>;
+	  /* return <div key={index}>
+		 <Row>
+		 <Col sm="6">
+		 <Form.Group className="mb-3" controlId="historyCreateTime">
+		 <Form.Label column sm="2">Data Alteração</Form.Label>
+		 <Form.Control readOnly defaultValue={history.CreateTime} />
+		 </Form.Group>
+		 </Col>
+		 <Col sm="6">
+		 <Form.Group className="mb-3" controlId="historyHistoryType">
+		 <Form.Label column sm="2">Tipo Alteração</Form.Label>
+		 <Form.Control readOnly defaultValue={history.HistoryType} />
+		 </Form.Group>
+		 </Col>
+		 </Row>
+		 <hr />
+		 </div>; */
 	});
 	/* TODO group by creation time as is done in OTRS - Filtrar as datas; pelas datas, filtrar os registros e montar uma exibição dessa filtragem */
 	/* let groupedByCreationTime;
@@ -132,13 +185,13 @@ export default class Painel extends React.Component {
 	  articles = data.Article.map((article, index) => {
 		return <Tab.Pane eventKey={`articleId_${article.ArticleID}`} key={index}>
 		  <Row>
-			<Col sm="6">
+			<Col sm="4">
 			  <Form.Group className="mb-3" controlId="articleChangeTime">
-				<Form.Label column sm="4">Última Alteração</Form.Label>
+				<Form.Label column sm="6">Alterado em</Form.Label>
 				<Form.Control readOnly defaultValue={article.ChangeTime} />
 			  </Form.Group>
 			</Col>
-			<Col sm="6">
+			<Col sm="8">
 			  <Form.Group className="mb-3" controlId="articleTo">
 				<Form.Label column sm="4">Remetente</Form.Label>
 				<Form.Control readOnly defaultValue={article.From} />
@@ -157,17 +210,29 @@ export default class Painel extends React.Component {
 	  });
 	}
 
-	if (data.TicketNumber == '2022032802000041') {
-	  console.debug('---------------');
-	  console.debug(data);
-	  console.debug(hist);
-	  console.debug(articles);
-	  console.debug("TODO get all CI");
-	  console.debug('---------------');
+	const locations = this.state.locations.filter((item) => item.TicketID == data.id)[0].Locations;
+
+	let locations_data;
+	if (locations.length > 0) {
+	  locations_data = this.state.locations.filter((item) => item.TicketID == data.id)[0].Locations.map((location, index) => {
+		return <tr key={index}>
+		  <td>{location.id}</td>
+		  <td>{location.name}</td>
+		  <td>{location.configitem_number}</td>
+		  <td><Badge bg="info">{location.incident_state}</Badge></td>
+		</tr>;
+	  });
+	} else {
+	  locations_data = <tr>
+		<td>#N/A</td>
+		<td>#N/A</td>
+		<td>#N/A</td>
+		<td><Badge bg="danger">#N/A</Badge></td>
+	  </tr>;
 	}
 
 	return <>
-	  <Tabs defaultActiveKey="info" id="uncontrolled-tab-example" className="mb-3">
+	  <Tabs defaultActiveKey="info" id="painel" className="mb-3">
 		<Tab eventKey="info" title="Informações">
 		  <Tab.Container id="left-tabs-example" defaultActiveKey="first">
 			<Row>
@@ -185,12 +250,6 @@ export default class Painel extends React.Component {
 				<Tab.Content>
 				  <Tab.Pane eventKey="first">
 					<h4>{data.Title}</h4>
-					{/* <Row>
-						<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
-						<Form.Label column sm="2">Título</Form.Label>
-						<Col sm="10"><Form.Control readOnly defaultValue={data.Title} /></Col>
-						</Form.Group>
-						</Row> */}
 					<Row>
 					  <Col sm="3">
 						<Form.Group className="mb-3" controlId="formPlaintextEmail">
@@ -267,13 +326,25 @@ export default class Painel extends React.Component {
 			</Row>
 		  </Tab.Container>
 		</Tab>
-		<Tab eventKey="customerService" title="Atendimento">
-		  {hist}
+		<Tab eventKey="location" title="Unidades Associadas">
+		  <Table striped bordered hover>
+			<thead>
+			  <tr>
+				<th>#</th>
+				<th>Nome</th>
+				<th>Número</th>
+				<th>Estado de Incidente</th>
+			  </tr>
+			</thead>
+			<tbody>
+			  {locations_data}
+			</tbody>
+		  </Table>
 		</Tab>
 		<Tab eventKey="equipment" title="Equipamentos">
 		  <pre>Todo show all CIs</pre>
 		</Tab>
-		<Tab eventKey="description" title="Descrição Completa" >
+		<Tab eventKey="description" title="Interações" >
 		  <Tab.Container id="articles" defaultActiveKey={firstArticle}>
 			<Row>
 			  <Col sm={3}>
@@ -289,52 +360,21 @@ export default class Painel extends React.Component {
 			</Row>
 		  </Tab.Container>
 		</Tab>
+		<Tab eventKey="customerService" title="Atendimento">
+		  <Table striped bordered hover>
+			<thead>
+			  <tr>
+				<th>Data Alteração</th>
+				<th>Tipo Alteração</th>
+			  </tr>
+			</thead>
+			<tbody>
+			  {hist}
+			</tbody>
+		  </Table>
+		</Tab>
 	  </Tabs>
 	</>
-  }
-
-  componentDidMount() {
-	/* console.clear(); */
-
-	const user = JSON.parse(localStorage.getItem("user"));
-	API.get(`/gestaoti/otrs/list_ticket_by_customer?customer=${user.username}`)
-	   .then((response) => {
-		 console.debug(response.data);
-
-		 let tickets = [];
-		 let histories = [];
-		 response.data.TicketID.forEach((tid) => {
-		   tickets.push({
-			 id: tid,
-			 action: <Button variant="outline-primary" onClick={() => this.getTicketDetail(tid) }><span className="bi bi-bezier"></span></Button>,
-			 TicketNumber: `Ticket ID ${tid}`,
-			 Local: `Carregando dados`,
-			 Created: `Carregando dados`,
-			 Owner: `Carregando dados`,
-			 State: `Carregando dados`
-		   });
-
-		   histories.push({
-			 TicketID: tid,
-			 History: null
-		   });
-		 });
-
-		 this.setState({ loadingData: false, data: tickets, histories: histories }, () => {
-		   response.data.TicketID.forEach((tid) => {
-			 this.getTicketDetail(tid);
-
-			 this.getTicketHistory(tid);
-			 /* console.log(`TODO call CI for ${tid}`);
-				console.log(`TODO call SCREENING for ${tid}`); */
-		   });
-		 });
-	   })
-	   .catch((error) => {
-		 console.log("Error with getting customer tickets");
-		 console.error(error);
-	   })
-	;
   }
 
   // FIXME when loading, fields with "loading" placeholder isn't updating - occurs only when tab is open before dynamic loading
@@ -380,6 +420,22 @@ export default class Painel extends React.Component {
 	;
   }
 
+  getLocations(ticketId) {
+	API.get(`/sigat-api/otrs/locations/by_ticket?ticket_id=${ticketId}`)
+	   .then((response) => {
+		 this.setState((state, props) => {
+		   return {
+			 locations: state.locations.map((item) => (item.TicketID == ticketId) ? {...item, Locations: response.data} : item)
+		   }
+		 });
+	   })
+	   .catch((error) => {
+		 console.log(`Error getting Location: ID ${ticketId} `);
+		 console.log(error);
+	   })
+	;
+  }
+
   handleProp(prop, value) {
 	this.setState({[prop]: value});
   }
@@ -416,11 +472,11 @@ export default class Painel extends React.Component {
 		</Navbar>
 		<div className="container" >
 		  <DataTable
-		  columns={columns}
-		  data={this.state.data}
-		  expandableRows
+			columns={columns}
+			data={this.state.data}
+			expandableRows
 			expandableRowsComponent={this.expandedComponent}
-		  pagination
+			pagination
 			progressPending={this.state.loadingData}
 		  />
 		</div>

@@ -242,7 +242,7 @@ Descrição: ${this.state.description}`);
 	kc.setCallback(function () {
       /* kc.disable(); */
 	  console.log("Konami Code exec!");
-	  alert("Você destravou uma feature de testes: PAINEL de chamados! XD");
+	  alert("Com a benção do Pai de Todos da TI ;) você destravou uma feature de testes: PAINEL de chamados! XD");
 	  window.location.assign('/painel');
 	});
 

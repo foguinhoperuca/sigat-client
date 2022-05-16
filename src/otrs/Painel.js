@@ -11,6 +11,7 @@ import Badge from 'react-bootstrap/Badge';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
+import Spinner from 'react-bootstrap/Spinner';
 import logopms from '../images/logo_pms.png';
 
 import DataTable from 'react-data-table-component';
@@ -45,10 +46,6 @@ const columns = [
   }
 ];
 
-const ExpandedComponent = ({data}) => {
-
-};
-
 /* TODO to smooth out the rough edges:
  * - Verify if user is logged in (client-side)
  * - Handle HTTP 401, 500, etc
@@ -65,7 +62,8 @@ export default class Painel extends React.Component {
 	  loadingData: true,
 	  data: [],
 	  histories: [],
-	  locations: []
+	  locations: [],
+	  computers: []
 	};
 
 	this.handleProp = this.handleProp.bind(this);
@@ -74,6 +72,7 @@ export default class Painel extends React.Component {
 	this.getTicketDetail = this.getTicketDetail.bind(this);
 	this.getTicketHistory = this.getTicketHistory.bind(this);
 	this.getLocations = this.getLocations.bind(this);
+	this.getComputers = this.getComputers.bind(this);
 
 	this.inspectState = this.inspectState.bind(this);
 	this.expandedComponent = this.expandedComponent.bind(this);
@@ -87,6 +86,8 @@ export default class Painel extends React.Component {
 	console.log(this.state.histories);
 	console.log("--- location ---");
 	console.log(this.state.locations);
+	console.log("--- computer ---");
+	console.log(this.state.computers);
   }
 
   componentDidMount() {
@@ -98,14 +99,15 @@ export default class Painel extends React.Component {
 		 let tickets = [];
 		 let histories = [];
 		 let locations = [];
+		 let computers = [];
 		 response.data.TicketID.forEach((tid) => {
 		   tickets.push({
 			 id: tid,
 			 action: <Button variant="outline-primary" onClick={() => this.getTicketDetail(tid) }><span className="bi bi-bezier"></span></Button>,
 			 TicketNumber: `Ticket ID ${tid}`,
-			 Created: `Carregando dados`,
-			 Owner: `Carregando dados`,
-			 State: `Carregando dados`
+			 Created: <Spinner animation="border" role="status" variant="info" size="sm"><span className="visually-hidden">Loading...</span></Spinner>,
+			 Owner: <Spinner animation="border" role="status" variant="info" size="sm"><span className="visually-hidden">Loading...</span></Spinner>,
+			 State: <Spinner animation="border" role="status" variant="info" size="sm"><span className="visually-hidden">Loading...</span></Spinner>
 		   });
 
 		   histories.push({
@@ -117,9 +119,14 @@ export default class Painel extends React.Component {
 			 TicketID: tid,
 			 Locations: null
 		   });
+
+		   computers.push({
+			 TicketID: tid,
+			 Computers: null
+		   });
 		 });
 
-		 this.setState({ loadingData: false, data: tickets, histories: histories, locations: locations }, () => {
+		 this.setState({ loadingData: false, data: tickets, histories: histories, locations: locations, computers: computers }, () => {
 		   response.data.TicketID.forEach((tid) => {
 			 this.getTicketDetail(tid);
 
@@ -127,6 +134,8 @@ export default class Painel extends React.Component {
 
 			 /* TODO implement search location's id backend */
 			 this.getLocations(tid);
+
+			 this.getComputers(tid);
 		   });
 		 });
 	   })
@@ -211,7 +220,6 @@ export default class Painel extends React.Component {
 	}
 
 	const locations = this.state.locations.filter((item) => item.TicketID == data.id)[0].Locations;
-
 	let locations_data;
 	if (locations.length > 0) {
 	  locations_data = this.state.locations.filter((item) => item.TicketID == data.id)[0].Locations.map((location, index) => {
@@ -224,6 +232,26 @@ export default class Painel extends React.Component {
 	  });
 	} else {
 	  locations_data = <tr>
+		<td>#N/A</td>
+		<td>#N/A</td>
+		<td>#N/A</td>
+		<td><Badge bg="danger">#N/A</Badge></td>
+	  </tr>;
+	}
+
+	const computers = this.state.locations.filter((item) => item.TicketID == data.id)[0].Locations;
+	let computers_data;
+	if (computers.length > 0) {
+	  computers_data = this.state.computers.filter((item) => item.TicketID == data.id)[0].Computers.map((computer, index) => {
+		return <tr key={index}>
+		  <td>{computer.id}</td>
+		  <td>{computer.name}</td>
+		  <td>{computer.configitem_number}</td>
+		  <td><Badge bg="info">{computer.incident_state}</Badge></td>
+		</tr>;
+	  });
+	} else {
+	  computers_data = <tr>
 		<td>#N/A</td>
 		<td>#N/A</td>
 		<td>#N/A</td>
@@ -342,7 +370,19 @@ export default class Painel extends React.Component {
 		  </Table>
 		</Tab>
 		<Tab eventKey="equipment" title="Equipamentos">
-		  <pre>Todo show all CIs</pre>
+		  <Table striped bordered hover>
+			<thead>
+			  <tr>
+				<th>#</th>
+				<th>Nome</th>
+				<th>Número</th>
+				<th>Estado de Incidente</th>
+			  </tr>
+			</thead>
+			<tbody>
+			  {computers_data}
+			</tbody>
+		  </Table>
 		</Tab>
 		<Tab eventKey="description" title="Interações" >
 		  <Tab.Container id="articles" defaultActiveKey={firstArticle}>
@@ -431,6 +471,22 @@ export default class Painel extends React.Component {
 	   })
 	   .catch((error) => {
 		 console.log(`Error getting Location: ID ${ticketId} `);
+		 console.log(error);
+	   })
+	;
+  }
+
+  getComputers(ticketId) {
+	API.get(`/sigat-api/otrs/computers/by_ticket?ticket_id=${ticketId}`)
+	   .then((response) => {
+		 this.setState((state, props) => {
+		   return {
+			 computers: state.computers.map((item) => (item.TicketID == ticketId) ? {...item, Computers: response.data} : item)
+		   }
+		 });
+	   })
+	   .catch((error) => {
+		 console.log(`Error getting Computer: ID ${ticketId} `);
 		 console.log(error);
 	   })
 	;

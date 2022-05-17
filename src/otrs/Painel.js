@@ -49,8 +49,6 @@ const columns = [
 /* TODO to smooth out the rough edges:
  * - Verify if user is logged in (client-side)
  * - Handle HTTP 401, 500, etc
- * - Show ticket detail
- * - Integrate with screening (show screening)
  */ 
 export default class Painel extends React.Component {
   constructor(props) {
@@ -67,15 +65,15 @@ export default class Painel extends React.Component {
 	};
 
 	this.handleProp = this.handleProp.bind(this);
-	this.handleChange = this.handleChange.bind(this);
 
+	this.expandedComponent = this.expandedComponent.bind(this);
 	this.getTicketDetail = this.getTicketDetail.bind(this);
 	this.getTicketHistory = this.getTicketHistory.bind(this);
 	this.getLocations = this.getLocations.bind(this);
 	this.getComputers = this.getComputers.bind(this);
 
 	this.inspectState = this.inspectState.bind(this);
-	this.expandedComponent = this.expandedComponent.bind(this);
+	this.handleChange = this.handleChange.bind(this);
   }
 
   inspectState() {
@@ -153,23 +151,6 @@ export default class Painel extends React.Component {
 		<td>{history.CreateTime}</td>
 		<td><Badge bg="info">{history.HistoryType}</Badge></td>
 	  </tr>;
-	  /* return <div key={index}>
-		 <Row>
-		 <Col sm="6">
-		 <Form.Group className="mb-3" controlId="historyCreateTime">
-		 <Form.Label column sm="2">Data Alteração</Form.Label>
-		 <Form.Control readOnly defaultValue={history.CreateTime} />
-		 </Form.Group>
-		 </Col>
-		 <Col sm="6">
-		 <Form.Group className="mb-3" controlId="historyHistoryType">
-		 <Form.Label column sm="2">Tipo Alteração</Form.Label>
-		 <Form.Control readOnly defaultValue={history.HistoryType} />
-		 </Form.Group>
-		 </Col>
-		 </Row>
-		 <hr />
-		 </div>; */
 	});
 	/* TODO group by creation time as is done in OTRS - Filtrar as datas; pelas datas, filtrar os registros e montar uma exibição dessa filtragem */
 	/* let groupedByCreationTime;
@@ -231,11 +212,11 @@ export default class Painel extends React.Component {
 		</tr>;
 	  });
 	} else {
-	  locations_data = <tr>
-		<td>#N/A</td>
-		<td>#N/A</td>
-		<td>#N/A</td>
-		<td><Badge bg="danger">#N/A</Badge></td>
+	  locations_data = <tr className="table-danger">
+		<td><Badge bg="warning">#N/A</Badge></td>
+		<td><Badge bg="warning">#N/A</Badge></td>
+		<td><Badge bg="warning">#N/A</Badge></td>
+		<td><Badge bg="warning">#N/A</Badge></td>
 	  </tr>;
 	}
 
@@ -251,11 +232,11 @@ export default class Painel extends React.Component {
 		</tr>;
 	  });
 	} else {
-	  computers_data = <tr>
-		<td>#N/A</td>
-		<td>#N/A</td>
-		<td>#N/A</td>
-		<td><Badge bg="danger">#N/A</Badge></td>
+	  computers_data = <tr className="table-danger">
+		<td><Badge bg="warning">#N/A</Badge></td>
+		<td><Badge bg="warning">#N/A</Badge></td>
+		<td><Badge bg="warning">#N/A</Badge></td>
+		<td><Badge bg="warning">#N/A</Badge></td>
 	  </tr>;
 	}
 
@@ -277,7 +258,7 @@ export default class Painel extends React.Component {
 			  <Col sm={9}>
 				<Tab.Content>
 				  <Tab.Pane eventKey="first">
-					<h4>{data.Title}</h4>
+					<h4>{data.Title}<small>&nbsp;<Badge pill bg="secondary">{data.TicketID}</Badge></small></h4>
 					<Row>
 					  <Col sm="3">
 						<Form.Group className="mb-3" controlId="formPlaintextEmail">
@@ -304,9 +285,35 @@ export default class Painel extends React.Component {
 						</Form.Group>
 					  </Col>
 					</Row>
+					<Row>
+					  <Col sm="3">
+						<Form.Group className="mb-3" controlId="formPlaintextEmail">
+						  <Form.Label column sm="2">Prioridade</Form.Label>
+						  <Form.Control readOnly defaultValue={data.Priority} />
+						</Form.Group>
+					  </Col>
+					  <Col sm="3">
+						<Form.Group className="mb-3" controlId="formPlaintextEmail">
+						  <Form.Label column sm="2">Alteração</Form.Label>
+						  <Form.Control readOnly defaultValue={data.Changed} />
+						</Form.Group>
+					  </Col>
+					  <Col sm="3">
+						<Form.Group className="mb-3" controlId="formPlaintextEmail">
+						  <Form.Label column sm="2">Trancado?</Form.Label>
+						  <Form.Control readOnly defaultValue={data.Lock} />
+						</Form.Group>
+					  </Col>
+					  <Col sm="3">
+						<Form.Group className="mb-3" controlId="formPlaintextEmail">
+						  <Form.Label column sm="2">Tipo</Form.Label>
+						  <Form.Control readOnly defaultValue={data.Type} />
+						</Form.Group>
+					  </Col>
+					</Row>
 					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
 					  <Form.Label column sm="2">Solicitante</Form.Label>
-					  <Col sm="10"><Form.Control readOnly defaultValue={data.CustomerID} /></Col>
+					  <Form.Control readOnly defaultValue={data.CustomerID} />
 					</Form.Group>
 				  </Tab.Pane>
 				  <Tab.Pane eventKey="second">
@@ -318,35 +325,13 @@ export default class Painel extends React.Component {
 					  <Form.Label column sm="2">Número do Ticket</Form.Label>
 					  <Col sm="10"><Form.Control readOnly defaultValue={data.TicketNumber} /></Col>
 					</Form.Group>
-
-
-					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
-					  <Form.Label column sm="2">Prioridade</Form.Label>
-					  <Col sm="10"><Form.Control readOnly defaultValue={data.Priority} /></Col>
-					</Form.Group>
-
 					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
 					  <Form.Label column sm="2">Responsável</Form.Label>
 					  <Col sm="10"><Form.Control readOnly defaultValue={data.Responsible} /></Col>
 					</Form.Group>
 					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
-					  <Form.Label column sm="2">Última Alteração</Form.Label>
-					  <Col sm="10"><Form.Control readOnly defaultValue={data.Changed} /></Col>
-					</Form.Group>
-
-
-					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
 					  <Form.Label column sm="2">Usuário Solicitante</Form.Label>
 					  <Col sm="10"><Form.Control readOnly defaultValue={data.CustomerUserID} /></Col>
-					</Form.Group>
-
-					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
-					  <Form.Label column sm="2">Trancado?</Form.Label>
-					  <Col sm="10"><Form.Control readOnly defaultValue={data.Lock} /></Col>
-					</Form.Group>
-					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
-					  <Form.Label column sm="2">Tipo</Form.Label>
-					  <Col sm="10"><Form.Control readOnly defaultValue={data.Type} /></Col>
 					</Form.Group>
 				  </Tab.Pane>
 				</Tab.Content>

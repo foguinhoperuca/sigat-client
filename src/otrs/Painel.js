@@ -12,6 +12,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
 import Spinner from 'react-bootstrap/Spinner';
+import Alert from 'react-bootstrap/Alert';
 import logopms from '../images/logo_pms.png';
 
 import DataTable from 'react-data-table-component';
@@ -65,6 +66,7 @@ export default class Painel extends React.Component {
 	};
 
 	this.handleProp = this.handleProp.bind(this);
+	this.fetchData = this.fetchData.bind(this);
 
 	this.expandedComponent = this.expandedComponent.bind(this);
 	this.getTicketDetail = this.getTicketDetail.bind(this);
@@ -73,7 +75,6 @@ export default class Painel extends React.Component {
 	this.getComputers = this.getComputers.bind(this);
 
 	this.inspectState = this.inspectState.bind(this);
-	this.handleChange = this.handleChange.bind(this);
   }
 
   inspectState() {
@@ -89,6 +90,14 @@ export default class Painel extends React.Component {
   }
 
   componentDidMount() {
+	if (this.state.isLoggedIn) {
+	  this.fetchData();
+	} else {
+	  console.log("ComponentDidMount not logged in!!");
+	}
+  }
+
+  fetchData() {
 	const user = JSON.parse(localStorage.getItem("user"));
 	API.get(`/gestaoti/otrs/list_ticket_by_customer?customer=${user.username}`)
 	   .then((response) => {
@@ -127,12 +136,8 @@ export default class Painel extends React.Component {
 		 this.setState({ loadingData: false, data: tickets, histories: histories, locations: locations, computers: computers }, () => {
 		   response.data.TicketID.forEach((tid) => {
 			 this.getTicketDetail(tid);
-
 			 this.getTicketHistory(tid);
-
-			 /* TODO implement search location's id backend */
 			 this.getLocations(tid);
-
 			 this.getComputers(tid);
 		   });
 		 });
@@ -153,14 +158,6 @@ export default class Painel extends React.Component {
 	  </tr>;
 	});
 	/* TODO group by creation time as is done in OTRS - Filtrar as datas; pelas datas, filtrar os registros e montar uma exibição dessa filtragem */
-	/* let groupedByCreationTime;
-	   createTimes = this.state.histories.filter((item) => item.TicketID == data.id)[0].History.filter((v, i, a) => a.indexOf(v) === i);
-	   createTimes.forEach((createTime) => {
-	   filtered =
-	   groupedByCreationTime += <>
-	   </>;
-	   }); */
-
 
 	let navArticles = "";
 	let articles = <pre>Nenhum artigo para exibir!!</pre>;
@@ -478,16 +475,15 @@ export default class Painel extends React.Component {
   }
 
   handleProp(prop, value) {
-	this.setState({[prop]: value});
-  }
-
-  handleChange(event) {
-	this.setState({
-	  TicketNumber: event.target.value
+	this.setState({[prop]: value}, () => {
+	  /* TODO implement function signature with a callback. */
+	  if (prop == 'isLoggedIn' && value == true)
+		this.fetchData();
 	});
   }
 
   render() {
+	const panel = (this.state.isLoggedIn) ? <DataTable columns={columns} data={this.state.data} expandableRowsComponent={this.expandedComponent} expandableRows pagination /> : <><br /><Alert variant="danger">Efetue o login antes de enviar o chamado para triagem!</Alert></>;
 	return (
 	  <div className="App">
 		<header className="App-header" id="main-header">
@@ -511,15 +507,8 @@ export default class Painel extends React.Component {
 			</Navbar.Collapse>
 		  </Container>
 		</Navbar>
-		<div className="container" >
-		  <DataTable
-			columns={columns}
-			data={this.state.data}
-			expandableRows
-			expandableRowsComponent={this.expandedComponent}
-			pagination
-			progressPending={this.state.loadingData}
-		  />
+		<div className="container">
+		  {panel}
 		</div>
 	  </div>
 	);

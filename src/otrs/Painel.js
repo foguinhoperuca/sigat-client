@@ -220,7 +220,7 @@ export default class Painel extends React.Component {
 	  </tr>;
 	}
 
-	const computers = this.state.locations.filter((item) => item.TicketID == data.id)[0].Locations;
+	const computers = this.state.computers.filter((item) => item.TicketID == data.id)[0].Computers;
 	let computers_data;
 	if (computers.length > 0) {
 	  computers_data = this.state.computers.filter((item) => item.TicketID == data.id)[0].Computers.map((computer, index) => {

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './index.css';
 import App from './App';
+import Home from './Home';
 import Search from './otrs/Search';
 import Painel from './otrs/Painel';
 import reportWebVitals from './reportWebVitals';
@@ -16,7 +17,9 @@ root.render(
 
   <BrowserRouter>
 	<Routes>
-	  <Route path="/" element={<App />} />
+	  <Route path="/" element={<Home />} />
+	  <Route path="/home" element={<Home />} />
+	  <Route path="/triagem" element={<App />} />
 	  <Route path="pesquisar" element={<Search />} />
 	  <Route path="painel" element={<Painel />} />
 	  <Route path="*" element={<App />} />

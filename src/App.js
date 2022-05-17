@@ -247,17 +247,21 @@ Descrição: ${this.state.description}`);
 	});
 
 	let action;
-
+	let warning;
 	if (!this.state.isLoggedIn) {
 	  action = <Alert variant="danger">Efetue o login antes de enviar o chamado para triagem!</Alert>;
+	  warning = <Alert variant="danger">Efetue o login antes de enviar o chamado para triagem!</Alert>;
 	} else if (this.state.screening_id != null) {
 	  action =<>
 		<Alert variant="info">Ticket enviado com sucesso para triagem! Triagem #{this.state.screening_id} - Ticket Number: {this.state.ticket_number} - Criado em: {this.state.created_at}</Alert>
 		<Button variant="warning" onClick={this.handleSendAnother}>Enviar outro!</Button>
 	  </>
 	  ;
+	  /* TODO maybe show button here */
+	  warning = <Alert variant="info">Ticket enviado com sucesso para triagem! Triagem #{this.state.screening_id} - Ticket Number: {this.state.ticket_number} - Criado em: {this.state.created_at}</Alert>;
 	} else {
 	  action = <Button type="submit" variant="success">Enviar {this.state.isSending}</Button>;
+	  warning = "";
 	}
 
 	return (
@@ -288,6 +292,7 @@ Descrição: ${this.state.description}`);
 			</Navbar.Collapse>
 		  </Container>
 		</Navbar>
+		{warning}
 		<Form className="container" action={this.state.issue} onSubmit={this.handleSubmit}>
 		  <h3 id="hdrPerson">Informações</h3>
 		  <Person

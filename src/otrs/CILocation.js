@@ -1,18 +1,34 @@
 import React from 'react';
 import Table from 'react-bootstrap/Table';
 import Badge from 'react-bootstrap/Badge';
+import API from '../auth/Api';
 
 export default class CILocation extends React.Component {
   constructor(props) {
 	super(props);
 
 	this.state = {
+	  ticketId: props.ticketId,
 	  locations: props.locations
 	};
+
+	if (this.state.locations.length == 0) {
+	  API.get(`/sigat-api/otrs/locations/by_ticket?ticket_id=${this.state.ticketId}`)
+		 .then((response) => {
+		   this.props.onLoadLocations('locations', response.data, this.state.ticketId);
+		   this.setState({locations: response.data});
+		 })
+		 .catch((error) => {
+		   console.log(`Error getting Location: ID ${this.state.ticketId} `);
+		   console.log(error);
+		 })
+	  ;
+	}
   }
 
   render() {
 	let locations_data;
+
 	if (this.state.locations.length > 0) {
 	  locations_data = this.state.locations.map((location, index) => {
 		return <tr key={index}>
@@ -30,6 +46,7 @@ export default class CILocation extends React.Component {
 		<td><Badge bg="warning">#N/A</Badge></td>
 	  </tr>;
 	}
+
 	return (<div>
 	  <Table striped bordered hover>
 		<thead>

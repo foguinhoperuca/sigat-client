@@ -69,13 +69,12 @@ export default class Painel extends React.Component {
 	};
 
 	this.handleProp = this.handleProp.bind(this);
+	this.handleMergeProp = this.handleMergeProp.bind(this);
 	this.fetchData = this.fetchData.bind(this);
 	this.expandedComponent = this.expandedComponent.bind(this);
+
 	/* TODO move it to own method and lift state up */
 	this.getTicketDetail = this.getTicketDetail.bind(this);
-	this.getTicketHistory = this.getTicketHistory.bind(this);
-	this.getLocations = this.getLocations.bind(this);
-	this.getComputers = this.getComputers.bind(this);
 
 	this.inspectState = this.inspectState.bind(this);
   }
@@ -122,26 +121,23 @@ export default class Painel extends React.Component {
 
 		   histories.push({
 			 TicketID: tid,
-			 History: null
+			 histories: []
 		   });
 
 		   locations.push({
 			 TicketID: tid,
-			 Locations: null
+			 locations: []
 		   });
 
 		   computers.push({
 			 TicketID: tid,
-			 Computers: null
+			 computers: []
 		   });
 		 });
 
 		 this.setState({ loadingData: false, data: tickets, histories: histories, locations: locations, computers: computers }, () => {
 		   response.data.TicketID.forEach((tid) => {
 			 this.getTicketDetail(tid);
-			 this.getTicketHistory(tid);
-			 this.getLocations(tid);
-			 this.getComputers(tid);
 		   });
 		 });
 	   })
@@ -160,17 +156,17 @@ export default class Painel extends React.Component {
 			<TicketDetails data={data} />
 		  </Tab>
 		  <Tab eventKey="location" title="Unidades Associadas">
-			<CILocation ticketId={data.TicketID} locations={this.state.locations.filter((item) => item.TicketID == data.id)[0].Locations} />
+			<CILocation ticketId={data.TicketID} locations={this.state.locations.filter((item) => item.TicketID == data.id)[0].locations} onLoadLocations={this.handleMergeProp} />
 		  </Tab>
 		  <Tab eventKey="equipment" title="Equipamentos">
-			<CIComputer ticketId={data.TicketID} computers={this.state.computers.filter((item) => item.TicketID == data.id)[0].Computers} />
+			<CIComputer ticketId={data.TicketID} computers={this.state.computers.filter((item) => item.TicketID == data.id)[0].computers} onLoadComputers={this.handleMergeProp} />
 		  </Tab>
 		  <Tab eventKey="description" title="Interações" >
 			<Articles articles ={data.Article} />
 		  </Tab>
 		  <Tab eventKey="customerService" title="Atendimento">
 			{/* FIXME this code is exploding sometimes: filter is not working - some times data can't get by and undefined.map occurs... */}
-			<TicketHistories histories={this.state.histories.filter((item) => item.TicketID == data.id)[0].History} />
+			<TicketHistories ticketId={data.TicketID} histories={this.state.histories.filter((item) => item.TicketID == data.id)[0].histories} onLoadMergeProp={this.handleMergeProp} />
 		  </Tab>
 		</Tabs>
 	  </>
@@ -201,62 +197,19 @@ export default class Painel extends React.Component {
 	;
   }
 
-  getTicketHistory(ticketId) {
-	API.get(`/sigat-api/otrs/tickets/history?ticket_id=${ticketId}`)
-	   .then((response) => {
-		 console.debug(response.data);
-
-		 this.setState((state, props) => {
-		   return {
-			 /* FIXME catch backend's exception - cannot read properties of undefined (reading '0') --> HTTP 500 is returned and then explodes here!! */
-			 histories: state.histories.map((item) => (item.TicketID == ticketId) ? {...item, ...response.data.TicketHistory[0]} : item)
-		   }
-		 });
-	   })
-	   .catch((error) => {
-		 console.log(`Error getting Ticket History: ID ${ticketId} `);
-		 console.log(error);
-	   })
-	;
-  }
-
-  getLocations(ticketId) {
-	API.get(`/sigat-api/otrs/locations/by_ticket?ticket_id=${ticketId}`)
-	   .then((response) => {
-		 this.setState((state, props) => {
-		   return {
-			 locations: state.locations.map((item) => (item.TicketID == ticketId) ? {...item, Locations: response.data} : item)
-		   }
-		 });
-	   })
-	   .catch((error) => {
-		 console.log(`Error getting Location: ID ${ticketId} `);
-		 console.log(error);
-	   })
-	;
-  }
-
-  getComputers(ticketId) {
-	API.get(`/sigat-api/otrs/computers/by_ticket?ticket_id=${ticketId}`)
-	   .then((response) => {
-		 this.setState((state, props) => {
-		   return {
-			 computers: state.computers.map((item) => (item.TicketID == ticketId) ? {...item, Computers: response.data} : item)
-		   }
-		 });
-	   })
-	   .catch((error) => {
-		 console.log(`Error getting Computer: ID ${ticketId} `);
-		 console.log(error);
-	   })
-	;
-  }
-
   handleProp(prop, value) {
 	this.setState({[prop]: value}, () => {
 	  /* TODO implement function signature with a callback. */
 	  if (prop == 'isLoggedIn' && value == true)
 		this.fetchData();
+	});
+  }
+
+  handleMergeProp(prop, value, tid) {
+	this.setState((state, props) => {
+	  return {
+		[prop]: state[prop].map((item) => (item.TicketID == tid) ? {...item, [prop]: value} : item)
+	  };
 	});
   }
 

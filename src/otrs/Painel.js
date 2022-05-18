@@ -14,10 +14,14 @@ import Table from 'react-bootstrap/Table';
 import Spinner from 'react-bootstrap/Spinner';
 import Alert from 'react-bootstrap/Alert';
 import logopms from '../images/logo_pms.png';
-
 import DataTable from 'react-data-table-component';
 import API from '../auth/Api';
 import UserBadge from '../auth/UserBadge';
+import CIComputer from './CIComputer';
+import CILocation from './CILocation';
+import TicketDetails from './TicketDetails';
+import TicketHistories from './TicketHistories';
+import Articles from './Articles';
 
 const columns = [
   {
@@ -48,7 +52,6 @@ const columns = [
 ];
 
 /* TODO to smooth out the rough edges:
- * - Verify if user is logged in (client-side)
  * - Handle HTTP 401, 500, etc
  */ 
 export default class Painel extends React.Component {
@@ -67,8 +70,8 @@ export default class Painel extends React.Component {
 
 	this.handleProp = this.handleProp.bind(this);
 	this.fetchData = this.fetchData.bind(this);
-
 	this.expandedComponent = this.expandedComponent.bind(this);
+	/* TODO move it to own method and lift state up */
 	this.getTicketDetail = this.getTicketDetail.bind(this);
 	this.getTicketHistory = this.getTicketHistory.bind(this);
 	this.getLocations = this.getLocations.bind(this);
@@ -150,253 +153,28 @@ export default class Painel extends React.Component {
   }
 
   expandedComponent({data}) {
-	/* FIXME this code is exploding sometimes: filter is not working - some times data can't get by and undefined.map occurs... */
-	const hist = this.state.histories.filter((item) => item.TicketID == data.id)[0].History.map((history, index) => {
-	  return <tr key={index}>
-		<td>{history.CreateTime}</td>
-		<td><Badge bg="info">{history.HistoryType}</Badge></td>
-	  </tr>;
-	});
-	/* TODO group by creation time as is done in OTRS - Filtrar as datas; pelas datas, filtrar os registros e montar uma exibição dessa filtragem */
-
-	let navArticles = "";
-	let articles = <pre>Nenhum artigo para exibir!!</pre>;
-	let firstArticle = "";
-	if (data.Article !== undefined) {
-	  navArticles = data.Article.map((article, index) => {
-		if (index == 0)
-		  firstArticle = `articleId_${article.ArticleID}`;
-
-		return <Nav.Item key={index}><Nav.Link eventKey={`articleId_${article.ArticleID}`}>#{article.ArticleID} de {article.CreateTime}</Nav.Link></Nav.Item>;
-	  });
-	  articles = data.Article.map((article, index) => {
-		return <Tab.Pane eventKey={`articleId_${article.ArticleID}`} key={index}>
-		  <Row>
-			<Col sm="4">
-			  <Form.Group className="mb-3" controlId="articleChangeTime">
-				<Form.Label column sm="6">Alterado em</Form.Label>
-				<Form.Control readOnly defaultValue={article.ChangeTime} />
-			  </Form.Group>
-			</Col>
-			<Col sm="8">
-			  <Form.Group className="mb-3" controlId="articleTo">
-				<Form.Label column sm="4">Remetente</Form.Label>
-				<Form.Control readOnly defaultValue={article.From} />
-			  </Form.Group>
-			</Col>
-		  </Row>
-		  <Form.Group as={Row} className="mb-3" controlId="articleSubject">
-			<Form.Label column sm="2">Assunto</Form.Label>
-			<Col sm="10"><Form.Control readOnly defaultValue={article.Subject} /></Col>
-		  </Form.Group>
-		  <Form.Group as={Row} className="mb-3" controlId="articleBody">
-			<Form.Label column sm="2">Descrição</Form.Label>
-			<Col sm="10"><Form.Control as="textarea" rows={15} value={article.Body} readOnly /></Col>
-		  </Form.Group>
-	  </Tab.Pane>
-	  });
-	}
-
-	const locations = this.state.locations.filter((item) => item.TicketID == data.id)[0].Locations;
-	let locations_data;
-	if (locations.length > 0) {
-	  locations_data = this.state.locations.filter((item) => item.TicketID == data.id)[0].Locations.map((location, index) => {
-		return <tr key={index}>
-		  <td>{location.id}</td>
-		  <td>{location.name}</td>
-		  <td>{location.configitem_number}</td>
-		  <td><Badge bg="info">{location.incident_state}</Badge></td>
-		</tr>;
-	  });
-	} else {
-	  locations_data = <tr className="table-danger">
-		<td><Badge bg="warning">#N/A</Badge></td>
-		<td><Badge bg="warning">#N/A</Badge></td>
-		<td><Badge bg="warning">#N/A</Badge></td>
-		<td><Badge bg="warning">#N/A</Badge></td>
-	  </tr>;
-	}
-
-	const computers = this.state.computers.filter((item) => item.TicketID == data.id)[0].Computers;
-	let computers_data;
-	if (computers.length > 0) {
-	  computers_data = this.state.computers.filter((item) => item.TicketID == data.id)[0].Computers.map((computer, index) => {
-		return <tr key={index}>
-		  <td>{computer.id}</td>
-		  <td>{computer.name}</td>
-		  <td>{computer.configitem_number}</td>
-		  <td><Badge bg="info">{computer.incident_state}</Badge></td>
-		</tr>;
-	  });
-	} else {
-	  computers_data = <tr className="table-danger">
-		<td><Badge bg="warning">#N/A</Badge></td>
-		<td><Badge bg="warning">#N/A</Badge></td>
-		<td><Badge bg="warning">#N/A</Badge></td>
-		<td><Badge bg="warning">#N/A</Badge></td>
-	  </tr>;
-	}
-
-	return <>
-	  <Tabs defaultActiveKey="info" id="painel" className="mb-3">
-		<Tab eventKey="info" title="Informações">
-		  <Tab.Container id="left-tabs-example" defaultActiveKey="first">
-			<Row>
-			  <Col sm={3}>
-				<Nav variant="pills" className="flex-column">
-				  <Nav.Item>
-					<Nav.Link eventKey="first">Geral</Nav.Link>
-				  </Nav.Item>
-				  <Nav.Item>
-					<Nav.Link eventKey="second">Detalhes</Nav.Link>
-				  </Nav.Item>
-				</Nav>
-			  </Col>
-			  <Col sm={9}>
-				<Tab.Content>
-				  <Tab.Pane eventKey="first">
-					<h4>{data.Title}<small>&nbsp;<Badge pill bg="secondary">{data.TicketID}</Badge></small></h4>
-					<Row>
-					  <Col sm="3">
-						<Form.Group className="mb-3" controlId="formPlaintextEmail">
-						  <Form.Label column sm="2">Estado</Form.Label>
-						  <Form.Control readOnly defaultValue={data.State} />
-						</Form.Group>
-					  </Col>
-					  <Col sm="3">
-						<Form.Group className="mb-3" controlId="formPlaintextEmail">
-						  <Form.Label column sm="2">Fila</Form.Label>
-						  <Form.Control readOnly defaultValue={data.Queue} />
-						</Form.Group>
-					  </Col>
-					  <Col sm="3">
-						<Form.Group className="mb-3" controlId="formPlaintextEmail">
-						  <Form.Label column sm="2">Abertura</Form.Label>
-						  <Form.Control readOnly defaultValue={data.Created} />
-						</Form.Group>
-					  </Col>
-					  <Col sm="3">
-						<Form.Group className="mb-3" controlId="formPlaintextEmail">
-						  <Form.Label column sm="2">Proprietário</Form.Label>
-						  <Form.Control readOnly defaultValue={data.Owner} />
-						</Form.Group>
-					  </Col>
-					</Row>
-					<Row>
-					  <Col sm="3">
-						<Form.Group className="mb-3" controlId="formPlaintextEmail">
-						  <Form.Label column sm="2">Prioridade</Form.Label>
-						  <Form.Control readOnly defaultValue={data.Priority} />
-						</Form.Group>
-					  </Col>
-					  <Col sm="3">
-						<Form.Group className="mb-3" controlId="formPlaintextEmail">
-						  <Form.Label column sm="2">Alteração</Form.Label>
-						  <Form.Control readOnly defaultValue={data.Changed} />
-						</Form.Group>
-					  </Col>
-					  <Col sm="3">
-						<Form.Group className="mb-3" controlId="formPlaintextEmail">
-						  <Form.Label column sm="2">Trancado?</Form.Label>
-						  <Form.Control readOnly defaultValue={data.Lock} />
-						</Form.Group>
-					  </Col>
-					  <Col sm="3">
-						<Form.Group className="mb-3" controlId="formPlaintextEmail">
-						  <Form.Label column sm="2">Tipo</Form.Label>
-						  <Form.Control readOnly defaultValue={data.Type} />
-						</Form.Group>
-					  </Col>
-					</Row>
-					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
-					  <Form.Label column sm="2">Solicitante</Form.Label>
-					  <Form.Control readOnly defaultValue={data.CustomerID} />
-					</Form.Group>
-				  </Tab.Pane>
-				  <Tab.Pane eventKey="second">
-					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
-					  <Form.Label column sm="2">TicketID</Form.Label>
-					  <Col sm="10"><Form.Control readOnly defaultValue={data.TicketID} /></Col>
-					</Form.Group>
-					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
-					  <Form.Label column sm="2">Número do Ticket</Form.Label>
-					  <Col sm="10"><Form.Control readOnly defaultValue={data.TicketNumber} /></Col>
-					</Form.Group>
-					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
-					  <Form.Label column sm="2">Responsável</Form.Label>
-					  <Col sm="10"><Form.Control readOnly defaultValue={data.Responsible} /></Col>
-					</Form.Group>
-					<Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
-					  <Form.Label column sm="2">Usuário Solicitante</Form.Label>
-					  <Col sm="10"><Form.Control readOnly defaultValue={data.CustomerUserID} /></Col>
-					</Form.Group>
-				  </Tab.Pane>
-				</Tab.Content>
-			  </Col>
-			</Row>
-		  </Tab.Container>
-		</Tab>
-		<Tab eventKey="location" title="Unidades Associadas">
-		  <Table striped bordered hover>
-			<thead>
-			  <tr>
-				<th>#</th>
-				<th>Nome</th>
-				<th>Número</th>
-				<th>Estado de Incidente</th>
-			  </tr>
-			</thead>
-			<tbody>
-			  {locations_data}
-			</tbody>
-		  </Table>
-		</Tab>
-		<Tab eventKey="equipment" title="Equipamentos">
-		  <Table striped bordered hover>
-			<thead>
-			  <tr>
-				<th>#</th>
-				<th>Nome</th>
-				<th>Número</th>
-				<th>Estado de Incidente</th>
-			  </tr>
-			</thead>
-			<tbody>
-			  {computers_data}
-			</tbody>
-		  </Table>
-		</Tab>
-		<Tab eventKey="description" title="Interações" >
-		  <Tab.Container id="articles" defaultActiveKey={firstArticle}>
-			<Row>
-			  <Col sm={3}>
-				<Nav variant="pills" className="flex-column">
-				  {navArticles}
-				</Nav>
-			  </Col>
-			  <Col sm={9}>
-				<Tab.Content>
-				  {articles}
-				</Tab.Content>
-			  </Col>
-			</Row>
-		  </Tab.Container>
-		</Tab>
-		<Tab eventKey="customerService" title="Atendimento">
-		  <Table striped bordered hover>
-			<thead>
-			  <tr>
-				<th>Data Alteração</th>
-				<th>Tipo Alteração</th>
-			  </tr>
-			</thead>
-			<tbody>
-			  {hist}
-			</tbody>
-		  </Table>
-		</Tab>
-	  </Tabs>
-	</>
+	return (
+	  <>
+		<Tabs defaultActiveKey="info" id="painel" className="mb-3">
+		  <Tab eventKey="info" title="Informações">
+			<TicketDetails data={data} />
+		  </Tab>
+		  <Tab eventKey="location" title="Unidades Associadas">
+			<CILocation ticketId={data.TicketID} locations={this.state.locations.filter((item) => item.TicketID == data.id)[0].Locations} />
+		  </Tab>
+		  <Tab eventKey="equipment" title="Equipamentos">
+			<CIComputer ticketId={data.TicketID} computers={this.state.computers.filter((item) => item.TicketID == data.id)[0].Computers} />
+		  </Tab>
+		  <Tab eventKey="description" title="Interações" >
+			<Articles articles ={data.Article} />
+		  </Tab>
+		  <Tab eventKey="customerService" title="Atendimento">
+			{/* FIXME this code is exploding sometimes: filter is not working - some times data can't get by and undefined.map occurs... */}
+			<TicketHistories histories={this.state.histories.filter((item) => item.TicketID == data.id)[0].History} />
+		  </Tab>
+		</Tabs>
+	  </>
+	);
   }
 
   // FIXME when loading, fields with "loading" placeholder isn't updating - occurs only when tab is open before dynamic loading

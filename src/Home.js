@@ -100,9 +100,9 @@ export default class Home extends React.Component {
 		  {warning}
 		  <Button id="btnScreening" variant="primary" disabled={!this.state.isLoggedIn} onClick={this.handleNavigation}>Abrir Novo Chamado</Button>
 		  <small><Form.Text className="text-muted">Tenha em mãos um ramal para contato e o patrimônio do equipamento. Você precisará se identificar além de apontar o local onde encontra-se o equipamento.</Form.Text></small>
-		  <Button id="btnPainel" variant="secondary" disabled={!this.state.devmode} onClick={this.handleNavigation}>Painel</Button>
-		  <small><Form.Text className="text-muted"><strong>[EM DESENVOLVIMENTO]</strong> Veja os seus chamados com a TI!</Form.Text></small>
-		  <Button id="btnSearch" variant="outline-secondary" disabled={!this.state.devmode} onClick={this.handleNavigation}>Pesquisar Ticket</Button>
+		  <Button id="btnPainel" variant="secondary" disabled={!this.state.isLoggedIn} onClick={this.handleNavigation}>Painel</Button>
+		  <small><Form.Text className="text-muted">Veja os seus chamados com a TI!</Form.Text></small>
+		  <Button id="btnSearch" variant="outline-danger" disabled={!this.state.devmode} onClick={this.handleNavigation}>Pesquisar Ticket</Button>
 		  <small><Form.Text className="text-muted"><strong>[EM DESENVOLVIMENTO]</strong> Você precisará ter o número do Ticket em mãos!</Form.Text></small>
 		</Stack>
 	  </div>

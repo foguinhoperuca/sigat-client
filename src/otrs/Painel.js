@@ -51,9 +51,6 @@ const columns = [
   }
 ];
 
-/* TODO to smooth out the rough edges:
- * - Handle HTTP 401, 500, etc
- */ 
 export default class Painel extends React.Component {
   constructor(props) {
 	super(props);
@@ -72,23 +69,7 @@ export default class Painel extends React.Component {
 	this.handleMergeProp = this.handleMergeProp.bind(this);
 	this.fetchData = this.fetchData.bind(this);
 	this.expandedComponent = this.expandedComponent.bind(this);
-
-	/* TODO move it to own method and lift state up */
 	this.getTicketDetail = this.getTicketDetail.bind(this);
-
-	this.inspectState = this.inspectState.bind(this);
-  }
-
-  inspectState() {
-	console.clear();
-	console.log("--- data ---");
-	console.log(this.state.data);
-	console.log("--- history ---");
-	console.log(this.state.histories);
-	console.log("--- location ---");
-	console.log(this.state.locations);
-	console.log("--- computer ---");
-	console.log(this.state.computers);
   }
 
   componentDidMount() {
@@ -101,45 +82,62 @@ export default class Painel extends React.Component {
 
   fetchData() {
 	const user = JSON.parse(localStorage.getItem("user"));
-	API.get(`/gestaoti/otrs/list_ticket_by_customer?customer=${user.username}`)
+
+	API.get(`/sigat-api/otrs/tickets/index?customer=${user.username}`)
 	   .then((response) => {
-		 console.debug(response.data);
+		 console.log(response.data);
+		 console.log(response.data.TicketID == undefined);
 
 		 let tickets = [];
 		 let histories = [];
 		 let locations = [];
 		 let computers = [];
-		 response.data.TicketID.forEach((tid) => {
-		   tickets.push({
-			 id: tid,
-			 action: <Button variant="outline-primary" onClick={() => this.getTicketDetail(tid) }><span className="bi bi-bezier"></span></Button>,
-			 TicketNumber: `Ticket ID ${tid}`,
-			 Created: <Spinner animation="border" role="status" variant="info" size="sm"><span className="visually-hidden">Loading...</span></Spinner>,
-			 Owner: <Spinner animation="border" role="status" variant="info" size="sm"><span className="visually-hidden">Loading...</span></Spinner>,
-			 State: <Spinner animation="border" role="status" variant="info" size="sm"><span className="visually-hidden">Loading...</span></Spinner>
-		   });
 
-		   histories.push({
-			 TicketID: tid,
-			 histories: []
+		 if (response.data.TicketID == undefined) {
+		   this.setState({
+			 loadingData: false,
+			 data: [{
+			   id: 0,
+			   action: <span className="bi bi-bug"></span>,
+			   TicketNumber: <span className="bi bi-bug"></span>,
+			   Created: <span className="bi bi-bug"></span>,
+			   Owner: <span className="bi bi-bug"></span>,
+			   State: <span className="bi bi-bug"></span>
+			 }]
 		   });
-
-		   locations.push({
-			 TicketID: tid,
-			 locations: []
-		   });
-
-		   computers.push({
-			 TicketID: tid,
-			 computers: []
-		   });
-		 });
-
-		 this.setState({ loadingData: false, data: tickets, histories: histories, locations: locations, computers: computers }, () => {
+		 } else {
 		   response.data.TicketID.forEach((tid) => {
-			 this.getTicketDetail(tid);
+			 tickets.push({
+			   id: tid,
+			   action: <Button variant="outline-primary" onClick={() => this.getTicketDetail(tid) }><span className="bi bi-bezier"></span></Button>,
+			   TicketNumber: `Ticket ID ${tid}`,
+			   Created: <Spinner animation="border" role="status" variant="info" size="sm"><span className="visually-hidden">Loading...</span></Spinner>,
+			   Owner: <Spinner animation="border" role="status" variant="info" size="sm"><span className="visually-hidden">Loading...</span></Spinner>,
+			   State: <Spinner animation="border" role="status" variant="info" size="sm"><span className="visually-hidden">Loading...</span></Spinner>
+			 });
+
+			 histories.push({
+			   TicketID: tid,
+			   histories: []
+			 });
+
+			 locations.push({
+			   TicketID: tid,
+			   locations: []
+			 });
+
+			 computers.push({
+			   TicketID: tid,
+			   computers: []
+			 });
 		   });
-		 });
+
+		   this.setState({ loadingData: false, data: tickets, histories: histories, locations: locations, computers: computers }, () => {
+			 response.data.TicketID.forEach((tid) => {
+			   this.getTicketDetail(tid);
+			 });
+		   });
+		 }
 	   })
 	   .catch((error) => {
 		 console.log("Error with getting customer tickets");
@@ -177,13 +175,25 @@ export default class Painel extends React.Component {
   getTicketDetail(ticketId) {
 	API.get(`/sigat-api/otrs/tickets/show?ticket_id=${ticketId}&all_articles=true`)
 	   .then((response) => {
-		 console.debug(response.data.Ticket[0]);
+		 let ticket = null;
 
-		 let ticket = {
-		   id: ticketId,
-		   action: <Button variant="outline-info" onClick={() => this.getTicketDetail(ticketId) }><span className="bi bi-bezier"></span></Button>
-		 };
-		 ticket = {...response.data.Ticket[0], ...ticket};
+		 if (Object.keys(response.data.sigatapi_errors).length !== 0) {
+		   console.log("Error getting data from backend!");
+		   ticket = {
+			 id: ticketId,
+			 action: <Button variant="outline-primary" onClick={() => this.getTicketDetail(ticketId) }><span className="bi bi-bezier"></span></Button>,
+			 TicketNumber: <span className="bi bi-bug"></span>,
+			 Created: <span className="bi bi-bug"></span>,
+			 Owner: <span className="bi bi-bug"></span>,
+			 State: <span className="bi bi-bug"></span>
+		   }
+		 } else {
+		   ticket = {
+			 id: ticketId,
+			 action: <Button variant="outline-info" onClick={() => this.getTicketDetail(ticketId) }><span className="bi bi-bezier"></span></Button>
+		   };
+		   ticket = {...response.data.Ticket[0], ...ticket};
+		 }
 
 		 this.setState((state, props) => {
 		   return {
@@ -229,8 +239,7 @@ export default class Painel extends React.Component {
 			<Navbar.Toggle aria-controls="basic-navbar-nav" />
 			<Navbar.Collapse id="basic-navbar-nav">
 			  <Nav className="me-auto">
-				<Nav.Link as={Link} to="/">Abrir Chamado</Nav.Link>
-				<Button variant="outline-success" onClick={this.inspectState}>Inspecionar State</Button>
+				<Button variant="outline-warning" onClick={() => this.fetchData() }><span className="bi bi-bezier"></span> Recarregar</Button>
 			  </Nav>
 			  <Nav>
 				<UserBadge isLoggedIn={this.state.isLoggedIn} isLoggedInMessage={this.state.isLoggedInMessage} onIsLoggedInChange={this.handleProp} />

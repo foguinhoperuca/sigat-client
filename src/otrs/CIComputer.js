@@ -1,6 +1,7 @@
 import React from 'react';
 import Table from 'react-bootstrap/Table';
 import Badge from 'react-bootstrap/Badge';
+import Button from 'react-bootstrap/Button';
 import API from '../auth/Api';
 
 export default class CIComputer extends React.Component {
@@ -12,18 +13,40 @@ export default class CIComputer extends React.Component {
 	  computers: props.computers
 	};
 
-	if (this.state.computers.length == 0) {
-	  API.get(`/sigat-api/otrs/computers/by_ticket?ticket_id=${this.state.ticketId}`)
-		 .then((response) => {
-		   this.props.onLoadComputers('computers', response.data, this.state.ticketId);
-		   this.setState({computers: response.data});
-		 })
-		 .catch((error) => {
-		   console.log(`Error getting Computer: ID ${this.state.ticketId} `);
-		   console.log(error);
-		 })
-	  ;
+	this.getComputers = this.getComputers.bind(this);
+  }
+
+  componentDidMount() {
+	if (this.state.computers.length === 0) {
+	  this.getComputers();
 	}
+  }
+
+  getComputers() {
+	API.get(`/sigat-api/otrs/computers/by_ticket?ticket_id=${this.state.ticketId}`)
+	   .then((response) => {
+		 let computers = [{
+		   id: <span className="bi bi-bug"></span>,
+		   general_catalog_class_name: <span className="bi bi-bug"></span>,
+		   configitem_number: <span className="bi bi-bug"></span>,
+		   name: <span className="bi bi-bug"></span>,
+		   incident_state: <span className="bi bi-bug"></span>,
+		   deployment_state: <span className="bi bi-bug"></span>
+		 }];
+
+		 if (Object.keys(response.data.sigatapi_errors).length === 0)
+		   computers = response.data.computers;
+
+		 this.props.onLoadComputers('computers', computers, this.state.ticketId);
+		 this.setState({
+		   computers: computers
+		 });
+	   })
+	   .catch((error) => {
+		 console.log(`Error getting Computer: ID ${this.state.ticketId} `);
+		 console.log(error);
+	   })
+	;
   }
 
   render() {
@@ -61,6 +84,7 @@ export default class CIComputer extends React.Component {
 		  {computers_data}
 		</tbody>
 	  </Table>
+	  <Button size ="sm" variant="outline-warning" onClick={() => this.getComputers() }><span className="bi bi-bezier"></span> Recarregar!</Button>
 	</div>);
   }
 }

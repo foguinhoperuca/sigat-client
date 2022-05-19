@@ -94,7 +94,8 @@ export default class UserBadge extends React.Component {
   }
 
   render() {
-	const test_buttons = (process.env.REACT_APP_ENVIRONMENT === "development") ? <ApiPlayground onUserStatusChange={this.props.onIsLoggedInChange} /> : '';
+	const test_buttons = '';
+	/* const test_buttons = (process.env.REACT_APP_ENVIRONMENT === "development") ? <ApiPlayground onUserStatusChange={this.props.onIsLoggedInChange} /> : ''; */
 	const isLoggedIn = this.props.isLoggedIn;
 	let button;
 	const user = JSON.parse(localStorage.getItem("user"));
@@ -102,7 +103,7 @@ export default class UserBadge extends React.Component {
 	/* TODO use a good UI (already btn btn-primary) with Nav.Link history function */
 	if (isLoggedIn) {
 	  button = <>
-		Olá <Badge bg="info">{user.username}</Badge>!&nbsp;<a className="btn btn-danger btn-sm" href="/logout" onClick={this.handleLogout}><span className="bi bi-arrow-down"></span><span className="bi bi-door-closed"></span></a>
+		Olá <Badge bg="info">{user.username}</Badge>!&nbsp;<a className="btn btn-danger btn-sm" href="/logout" onClick={this.handleLogout}><span className="bi bi-arrow-down"></span><span className="bi bi-door-closed"></span></a>&nbsp;<a className="btn btn-dark btn-sm" href="/home"><span className="bi-arrow-clockwise"></span><span className="bi bi-house-door"></span></a>
 	  </>;
 	} else {
 	  button = <>
@@ -112,6 +113,10 @@ export default class UserBadge extends React.Component {
 		&nbsp;
 		<Button variant="primary" onClick={this.handleShow}>
           <span className="bi bi-arrow-up"></span><span className="bi bi-door-open"></span>
+		</Button>
+		&nbsp;
+		<Button variant="dark">
+		  <span className="bi-arrow-clockwise"></span><span className="bi bi-house-door"></span>
 		</Button>
 		<Modal show={this.state.show} onHide={this.handleClose}>
 		  <Modal.Header closeButton>

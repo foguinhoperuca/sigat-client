@@ -1,6 +1,7 @@
 import React from 'react';
 import Table from 'react-bootstrap/Table';
 import Badge from 'react-bootstrap/Badge';
+import Button from 'react-bootstrap/Button';
 import API from '../auth/Api';
 
 export default class CILocation extends React.Component {
@@ -12,18 +13,40 @@ export default class CILocation extends React.Component {
 	  locations: props.locations
 	};
 
-	if (this.state.locations.length == 0) {
-	  API.get(`/sigat-api/otrs/locations/by_ticket?ticket_id=${this.state.ticketId}`)
-		 .then((response) => {
-		   this.props.onLoadLocations('locations', response.data, this.state.ticketId);
-		   this.setState({locations: response.data});
-		 })
-		 .catch((error) => {
-		   console.log(`Error getting Location: ID ${this.state.ticketId} `);
-		   console.log(error);
-		 })
-	  ;
+	this.getLocations = this.getLocations.bind(this);
+  }
+
+  componentDidMount() {
+	if (this.state.locations.length === 0) {
+	  this.getLocations();
 	}
+  }
+
+  getLocations() {
+	API.get(`/sigat-api/otrs/locations/by_ticket?ticket_id=${this.state.ticketId}`)
+	   .then((response) => {
+		 let locations = [{
+		   id: <span className="bi bi-bug"></span>,
+		   general_catalog_class_name: <span className="bi bi-bug"></span>,
+		   configitem_number: <span className="bi bi-bug"></span>,
+		   name: <span className="bi bi-bug"></span>,
+		   incident_state: <span className="bi bi-bug"></span>,
+		   deployment_state: <span className="bi bi-bug"></span>
+		 }];
+
+		 if ((Object.keys(response.data.sigatapi_errors)).length === 0)
+		   locations = response.data.locations;
+
+		 this.props.onLoadLocations('locations', locations, this.state.ticketId);
+		 this.setState({
+		   locations: locations
+		 });
+	   })
+	   .catch((error) => {
+		 console.log(`Error getting Location: ID ${this.state.ticketId} `);
+		 console.log(error);
+	   })
+	;
   }
 
   render() {
@@ -61,6 +84,7 @@ export default class CILocation extends React.Component {
 		  {locations_data}
 		</tbody>
 	  </Table>
+	  <Button size ="sm" variant="outline-warning" onClick={() => this.getLocations() }><span className="bi bi-bezier"></span> Recarregar!</Button>
 	</div>);
   }
 }

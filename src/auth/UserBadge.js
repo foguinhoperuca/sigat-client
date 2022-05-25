@@ -94,11 +94,11 @@ export default class UserBadge extends React.Component {
   }
 
   render() {
-	const test_buttons = '';
-	/* const test_buttons = (process.env.REACT_APP_ENVIRONMENT === "development") ? <ApiPlayground onUserStatusChange={this.props.onIsLoggedInChange} /> : ''; */
+	const test_buttons = (process.env.REACT_APP_TEST_LINKS === "true") ? <ApiPlayground onUserStatusChange={this.props.onIsLoggedInChange} /> : '';
 	const isLoggedIn = this.props.isLoggedIn;
 	let button;
-	const user = JSON.parse(localStorage.getItem("user"));
+	/* FIXME login without localStorage.user but with token is breaking app! */
+	const user = (JSON.parse(localStorage.getItem("user")) === null) ? {username: '<FAÇA SEU LOGIN !!>'} : JSON.parse(localStorage.getItem("user"));
 
 	/* TODO use a good UI (already btn btn-primary) with Nav.Link history function */
 	if (isLoggedIn) {
@@ -115,37 +115,37 @@ export default class UserBadge extends React.Component {
           <span className="bi bi-arrow-up"></span><span className="bi bi-door-open"></span>
 		</Button>
 		&nbsp;
-		<Button variant="dark">
-		  <span className="bi-arrow-clockwise"></span><span className="bi bi-house-door"></span>
-		</Button>
-		<Modal show={this.state.show} onHide={this.handleClose}>
-		  <Modal.Header closeButton>
-			<Modal.Title>Acesso a Área Restrita</Modal.Title>
-		  </Modal.Header>
-		  <Modal.Body>
-			<Form className="container" onSubmit={this.handleLogin}>
-			  <Form.Group className="mb-3" controlId="txtUsername">
-				<Form.Label>Usuário</Form.Label>
-				<Form.Control placeholder="Usuário da Rede" aria-label="Usuário da Rede" required defaultValue={process.env.REACT_APP_SIGAT_API_USER} />
-				<Form.Text className="text-muted">
-				  É o mesmo utilizado para o logon na rede MS Windows.
-				</Form.Text>
-			  </Form.Group>
-			  <Form.Group className="mb-3" controlId="txtPassword">
-				<Form.Label>Senha</Form.Label>
-				<Form.Control type="password" placeholder="Password" required defaultValue={process.env.REACT_APP_SIGAT_API_PASSWORD} />
-			  </Form.Group>
-			  <Button variant="primary" type="submit">
-				Enviar
-			  </Button>
-			</Form>
-		  </Modal.Body>
-		  <Modal.Footer>.
-			<Button variant="secondary" onClick={this.handleClose}>
-			  Cancelar
+	  <Button variant="dark">
+		<span className="bi-arrow-clockwise"></span><span className="bi bi-house-door"></span>
+	  </Button>
+	  <Modal show={this.state.show} onHide={this.handleClose}>
+		<Modal.Header closeButton>
+		  <Modal.Title>Acesso a Área Restrita</Modal.Title>
+		</Modal.Header>
+		<Modal.Body>
+		  <Form className="container" onSubmit={this.handleLogin}>
+			<Form.Group className="mb-3" controlId="txtUsername">
+			  <Form.Label>Usuário</Form.Label>
+			  <Form.Control placeholder="Usuário da Rede" aria-label="Usuário da Rede" required defaultValue={(process.env.REACT_APP_SIGAT_API_USER === "development") ? process.env.REACT_APP_SIGAT_API_USER : ''} />
+			  <Form.Text className="text-muted">
+				É o mesmo utilizado para o logon na rede MS Windows.
+			  </Form.Text>
+			</Form.Group>
+			<Form.Group className="mb-3" controlId="txtPassword">
+			  <Form.Label>Senha</Form.Label>
+			  <Form.Control type="password" placeholder="Password" required defaultValue={(process.env.REACT_APP_SIGAT_API_USER === "development" ) ? process.env.REACT_APP_SIGAT_API_PASSWORD : ''} />
+			</Form.Group>
+			<Button variant="primary" type="submit">
+			  Enviar
 			</Button>
-		  </Modal.Footer>
-		</Modal>
+		  </Form>
+		</Modal.Body>
+		<Modal.Footer>.
+		  <Button variant="secondary" onClick={this.handleClose}>
+			Cancelar
+		  </Button>
+		</Modal.Footer>
+	  </Modal>
 	  </>;
 	}
 

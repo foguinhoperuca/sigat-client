@@ -126,14 +126,14 @@ export default class UserBadge extends React.Component {
 		  <Form className="container" onSubmit={this.handleLogin}>
 			<Form.Group className="mb-3" controlId="txtUsername">
 			  <Form.Label>Usuário</Form.Label>
-			  <Form.Control placeholder="Usuário da Rede" aria-label="Usuário da Rede" required defaultValue={(process.env.REACT_APP_SIGAT_API_USER === "development") ? process.env.REACT_APP_SIGAT_API_USER : ''} />
+			  <Form.Control placeholder="Usuário da Rede" aria-label="Usuário da Rede" required defaultValue={(process.env.REACT_APP_ENVIRONMENT === "development") ? process.env.REACT_APP_SIGAT_API_USER : ''} />
 			  <Form.Text className="text-muted">
 				É o mesmo utilizado para o logon na rede MS Windows.
 			  </Form.Text>
 			</Form.Group>
 			<Form.Group className="mb-3" controlId="txtPassword">
 			  <Form.Label>Senha</Form.Label>
-			  <Form.Control type="password" placeholder="Password" required defaultValue={(process.env.REACT_APP_SIGAT_API_USER === "development" ) ? process.env.REACT_APP_SIGAT_API_PASSWORD : ''} />
+			  <Form.Control type="password" placeholder="Password" required defaultValue={(process.env.REACT_APP_ENVIRONMENT === "development" ) ? process.env.REACT_APP_SIGAT_API_PASSWORD : ''} />
 			</Form.Group>
 			<Button variant="primary" type="submit">
 			  Enviar
